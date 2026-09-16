@@ -157,6 +157,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
         const q = query(usersRef, where('phone', '==', formattedPhone), limit(1));
         const querySnap = await getDocs(q);
 
+        // Check system security setting for multi-account restriction per device
+        const configSnap = await getDoc(doc(db, 'settings', 'systemConfig'));
+        const blockMultiDevice = configSnap.exists()
+          ? (configSnap.data().blockMultipleAccountsPerDevice ?? true)
+          : true;
+
         // Check if this device is already used by another phone number
         let isDeviceAlreadyUsed = false;
         if (effectiveDeviceId) {
@@ -175,6 +181,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
         if (!querySnap.empty) {
           const existing = querySnap.docs[0].data() as UserProfile;
+
+          // SECURITY GUARD: Admin & Counselor profiles CANNOT be accessed via student referral link
+          const isAdminOrCounselor =
+            existing.isCounselor ||
+            existing.role === 'main_counselor' ||
+            existing.role === 'sub_counselor' ||
+            existing.uid === 'admin_root' ||
+            existing.uid.startsWith('counselor_') ||
+            existing.uid.startsWith('sub_counselor_');
+
+          if (isAdminOrCounselor) {
+            setErrorMessage('এই নম্বরটি একজন এডমিন/কাউন্সিলরের। রেফারেল লিংক দিয়ে সরাসরি এডমিন বা কাউন্সিলর একাউন্টে প্রবেশ করা যাবে না। মেইন লিংকে গিয়ে পাসওয়ার্ড দিয়ে লগইন করুন।');
+            setLoading(false);
+            return;
+          }
+
           if (existing.isBlocked) {
             setErrorMessage('আপনার একাউন্টটি স্থগিত রয়েছে।');
             setLoading(false);
@@ -183,9 +205,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
           // Strict check: Is this phone number trying to log in from a DIFFERENT device?
           if (existing.deviceId && effectiveDeviceId && existing.deviceId !== effectiveDeviceId) {
-             setErrorMessage('এই মোবাইল নাম্বারটি অন্য একটি ডিভাইসে ইতিমধ্যে লগইন করা আছে। এক নাম্বার দিয়ে শুধুমাত্র একটি ডিভাইসেই লগইন করা যাবে।');
-             setLoading(false);
-             return;
+            setErrorMessage('এই মোবাইল নাম্বার দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট তৈরি করা হয়েছে। অন্য একটি ডিভাইসে এটি ব্যবহার করা যাবে না। (এক নাম্বার দিয়ে জাস্ট ১টি অ্যাকাউন্টই চলবে)।');
+            setLoading(false);
+            return;
           }
 
           targetUid = existing.uid;
@@ -207,8 +229,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
           };
         } else {
           // Fresh student registration via referral
-          if (isDeviceAlreadyUsed) {
-            setErrorMessage('এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে। এক ডিভাইস থেকে একাধিক অ্যাকাউন্ট খোলা যাবে না।');
+          if (blockMultiDevice && isDeviceAlreadyUsed) {
+            setErrorMessage('এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে। এডমিন সিকিউরিটি অন থাকায় এক ডিভাইস থেকে একাধিক অ্যাকাউন্ট খোলা যাবে না।');
             setLoading(false);
             return;
           }
@@ -383,10 +405,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
         return;
       }
 
-      const storedPin = userDoc.counselorPin;
+      const storedPin = userDoc.counselorPin ? userDoc.counselorPin.trim() : '1234';
       const isPinMatch =
-        (storedPin && storedPin.trim() === password.trim()) ||
-        password.trim() === '1234' ||
+        password.trim() === storedPin ||
         password.trim() === '212650';
 
       if (!isPinMatch) {

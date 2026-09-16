@@ -33,6 +33,7 @@ import {
   Ban,
   Globe,
   ShieldAlert,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   collection,
@@ -112,13 +113,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [showDeleteSelectedModal, setShowDeleteSelectedModal] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
 
-  // System Links state
+  // System Links & Security state
   const [whatsappChannelUrl, setWhatsappChannelUrl] = useState('');
   const [telegramUrl, setTelegramUrl] = useState('');
   const [facebookPageUrl, setFacebookPageUrl] = useState('');
   const [supportEmail, setSupportEmail] = useState('');
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [companyLogoUrl, setCompanyLogoUrl] = useState(initialLogoUrl);
+  const [blockMultipleAccountsPerDevice, setBlockMultipleAccountsPerDevice] = useState(true);
   const [savingLinks, setSavingLinks] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoUploadProgress, setLogoUploadProgress] = useState(0);
@@ -173,6 +175,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.supportEmail) setSupportEmail(cfg.supportEmail);
           if (cfg.youtubeVideoUrl) setYoutubeVideoUrl(cfg.youtubeVideoUrl);
           if (cfg.companyLogoUrl) setCompanyLogoUrl(cfg.companyLogoUrl);
+          if (cfg.blockMultipleAccountsPerDevice !== undefined) {
+            setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
+          }
         }
       } catch {}
     } catch (err) {
@@ -198,6 +203,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.supportEmail !== undefined) setSupportEmail(cfg.supportEmail);
           if (cfg.youtubeVideoUrl !== undefined) setYoutubeVideoUrl(cfg.youtubeVideoUrl);
           if (cfg.companyLogoUrl !== undefined) setCompanyLogoUrl(cfg.companyLogoUrl);
+          if (cfg.blockMultipleAccountsPerDevice !== undefined) {
+            setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
+          }
         }
       },
       (err) => console.warn('Admin systemConfig listener notice:', err)
@@ -624,11 +632,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           supportEmail: supportEmail.trim(),
           youtubeVideoUrl: youtubeVideoUrl.trim(),
           companyLogoUrl: companyLogoUrl.trim(),
+          blockMultipleAccountsPerDevice: blockMultipleAccountsPerDevice,
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
       );
-      setActionSuccess('কমিউনিটি ও সোশ্যাল লিংকসমূহ সফলভাবে সংরক্ষিত হয়েছে!');
+      setActionSuccess('কমিউনিটি ও সিকিউরিটি সেটিংস সফলভাবে সংরক্ষিত হয়েছে!');
       setTimeout(() => setActionSuccess(''), 3500);
     } catch (err) {
       console.error('Save links error:', err);
@@ -1708,8 +1717,48 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="max-w-2xl rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-md space-y-4">
             <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
               <LinkIcon className="h-4 w-4 text-emerald-400" />
-              <span>কমিউনিটি ও সোশ্যাল চ্যানেল লিংক সেটিংস</span>
+              <span>কমিউনিটি, ডিভাইস সিকিউরিটি ও সিস্টেম সেটিংস</span>
             </h2>
+
+            {/* SECURITY TOGGLE CARD: Multi-Account Creation Control */}
+            <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl ${blockMultipleAccountsPerDevice ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    <ShieldAlert className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-white">
+                      এক ডিভাইস থেকে একাধিক অ্যাকাউন্ট খোলা প্রতিরোধ (Device Security)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {blockMultipleAccountsPerDevice
+                        ? 'চালু (ON): এক ডিভাইস থেকে কেবল একটি অ্যাকাউন্ট খোলা যাবে (মাল্টিপল অ্যাকাউন্ট ব্লক করা থাকবে)।'
+                        : 'বন্ধ (OFF): এক ডিভাইস থেকে আনলিমিটেড একাধিক অ্যাকাউন্ট খোলা যাবে।'}
+                    </p>
+                  </div>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={blockMultipleAccountsPerDevice}
+                    onChange={(e) => setBlockMultipleAccountsPerDevice(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              <div className="text-[11px] font-medium pt-1 border-t border-amber-500/20 flex items-center gap-1.5 text-amber-300">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {blockMultipleAccountsPerDevice
+                    ? 'সিকিউরিটি অপশন ON আছে। একই ডিভাইস থেকে একাধিক নতুন অ্যাকাউন্ট খোলা বন্ধ থাকবে।'
+                    : 'সিকিউরিটি অপশন OFF আছে। একই ডিভাইস থেকে একাধিক অ্যাকাউন্ট খোলা যাবে।'}
+                </span>
+              </div>
+            </div>
 
             <form onSubmit={handleSaveSystemLinks} className="space-y-4">
               <div>
