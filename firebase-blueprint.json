@@ -1,0 +1,198 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered user or counselor profile in Unity Earning Live Chat",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique Firebase User ID" },
+        "name": { "type": "string", "maxLength": 50, "description": "User display name" },
+        "phone": { "type": "string", "maxLength": 20, "description": "WhatsApp / Mobile number" },
+        "photoURL": { "type": "string", "maxLength": 500000, "description": "Profile picture URL or compressed base64 avatar" },
+        "isBlocked": { "type": "boolean", "description": "Whether the user is blocked by admin" },
+        "isOnline": { "type": "boolean", "description": "Current presence status" },
+        "isCounselor": { "type": "boolean", "description": "Whether this user is a designated counselor" },
+        "counselorId": { "type": "string", "description": "UID of the counselor who referred this user" },
+        "lastActiveAt": { "type": "string", "format": "date-time", "description": "Last seen timestamp" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account registration timestamp" }
+      },
+      "required": ["uid", "name", "phone", "isBlocked", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "One-to-one conversation between two users or counselor and student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Conversation ID" },
+        "participantIds": { "type": "array", "description": "Array of participant user IDs" },
+        "participantDetails": { "type": "object", "description": "Display names, photos, and roles for fast lightweight render" },
+        "lastMessage": { "type": "string", "maxLength": 500, "description": "Snippet of the last message" },
+        "lastMessageSenderId": { "type": "string", "description": "UID of sender of last message" },
+        "lastMessageType": { "type": "string", "enum": ["text", "image", "audio"], "description": "Type of last message" },
+        "labels": { "type": "array", "description": "Array of label tags assigned by counselor" },
+        "counselorId": { "type": "string", "description": "Associated counselor ID" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last activity" },
+        "unreadCounts": { "type": "object", "description": "Unread message count per user ID" }
+      },
+      "required": ["id", "participantIds", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single chat message in a conversation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique message ID" },
+        "conversationId": { "type": "string", "description": "ID of parent conversation" },
+        "senderId": { "type": "string", "description": "Sender User ID" },
+        "receiverId": { "type": "string", "description": "Receiver User ID" },
+        "type": { "type": "string", "enum": ["text", "image", "audio"], "description": "Message media type" },
+        "content": { "type": "string", "maxLength": 5000, "description": "Message text or caption" },
+        "mediaUrl": { "type": "string", "maxLength": 500000, "description": "Compressed media data or URL" },
+        "mediaDuration": { "type": "number", "description": "Voice note duration in seconds" },
+        "status": { "type": "string", "enum": ["sent", "delivered", "read"], "description": "Delivery & read receipts" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Time sent" }
+      },
+      "required": ["id", "conversationId", "senderId", "receiverId", "type", "status", "timestamp"]
+    },
+    "ChatLabel": {
+      "title": "ChatLabel",
+      "description": "WhatsApp Business-style organizational label for counselor chats",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Label ID" },
+        "name": { "type": "string", "maxLength": 50, "description": "Label name" },
+        "color": { "type": "string", "description": "Label color code" },
+        "counselorId": { "type": "string", "description": "Owner counselor ID" }
+      },
+      "required": ["id", "name", "color"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrator account marker",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Admin UID" },
+        "role": { "type": "string", "enum": ["admin"], "description": "Administrator role" },
+        "email": { "type": "string", "description": "Admin contact email" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Admin grant timestamp" }
+      },
+      "required": ["uid", "role"]
+    },
+    "Device": {
+      "title": "Device",
+      "description": "Device registration record enforcing 1 device = 1 user",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string", "description": "Unique device fingerprint" },
+        "userId": { "type": "string", "description": "Linked user ID" },
+        "phone": { "type": "string", "description": "Linked phone number" },
+        "name": { "type": "string", "description": "Linked user name" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Registration timestamp" }
+      },
+      "required": ["deviceId", "userId", "phone", "createdAt"]
+    },
+    "LevelChat": {
+      "title": "LevelChat",
+      "description": "A Level Chat group created exclusively by counselors for student learning",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Level Chat unique ID" },
+        "name": { "type": "string", "description": "Level Chat Title" },
+        "levelNumber": { "type": "string", "description": "Level badge identifier (e.g. Level 1)" },
+        "description": { "type": "string", "description": "Level chat guidelines or summary" },
+        "createdByCounselorId": { "type": "string", "description": "Counselor UID" },
+        "createdByCounselorName": { "type": "string", "description": "Counselor Name" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "lastMessage": { "type": "string" },
+        "lastMessageSenderName": { "type": "string" },
+        "lastMessageType": { "type": "string" }
+      },
+      "required": ["id", "name", "createdByCounselorId", "createdAt"]
+    },
+    "LevelChatMessage": {
+      "title": "LevelChatMessage",
+      "description": "A chat message inside a Level Chat group",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Message ID" },
+        "levelChatId": { "type": "string", "description": "Level Chat ID" },
+        "senderId": { "type": "string", "description": "Sender UID" },
+        "senderName": { "type": "string", "description": "Sender display name" },
+        "senderPhoto": { "type": "string" },
+        "isCounselor": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["text", "image", "audio"] },
+        "content": { "type": "string" },
+        "mediaUrl": { "type": "string" },
+        "mediaDuration": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "levelChatId", "senderId", "senderName", "type", "timestamp"]
+    },
+    "BroadcastNotification": {
+      "title": "BroadcastNotification",
+      "description": "Push notification broadcast to all users and counselors",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification ID" },
+        "title": { "type": "string", "description": "Notification title" },
+        "message": { "type": "string", "description": "Notification message body" },
+        "targetRole": { "type": "string", "description": "Target audience" },
+        "senderName": { "type": "string", "description": "Sender identifier" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "message", "createdAt"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "System settings and configuration",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Setting ID" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/devices/{deviceId}": {
+      "schema": { "$ref": "#/entities/Device" },
+      "description": "Single device binding to prevent multiple registrations from same device"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Collection of user and counselor profiles"
+    },
+    "/labels/{labelId}": {
+      "schema": { "$ref": "#/entities/ChatLabel" },
+      "description": "Organizational chat labels for counselors"
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Collection of chat conversations"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Messages subcollection inside a conversation"
+    },
+    "/level_chats/{levelChatId}": {
+      "schema": { "$ref": "#/entities/LevelChat" },
+      "description": "Collection of Level Chats created by counselors"
+    },
+    "/level_chats/{levelChatId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/LevelChatMessage" },
+      "description": "Messages subcollection inside a Level Chat"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Privileged administrator records"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Setting" },
+      "description": "System settings and auto push configurations"
+    },
+    "/broadcast_notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/BroadcastNotification" },
+      "description": "Broadcast notifications for web push alerts"
+    }
+  }
+}

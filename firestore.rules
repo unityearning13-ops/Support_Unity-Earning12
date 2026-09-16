@@ -1,0 +1,101 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidPhone(phone) {
+      return phone is string && phone.size() >= 8 && phone.size() <= 25;
+    }
+
+    function isValidName(name) {
+      return name is string && name.size() > 0 && name.size() <= 60;
+    }
+
+    function isNotBlocked(uid) {
+      return !exists(/databases/$(database)/documents/users/$(uid)) ||
+        get(/databases/$(database)/documents/users/$(uid)).data.isBlocked != true;
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Users Collection - Allow lookup, registration, updates and deletion
+    match /users/{userId} {
+      allow read: if true;
+
+      allow create: if isValidName(request.resource.data.name) &&
+        isValidPhone(request.resource.data.phone) &&
+        request.resource.data.isBlocked == false;
+
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    // Devices Collection - Enforce 1 device = 1 user registration
+    match /devices/{deviceId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if true;
+    }
+
+    // Blocked Entities (IPs, Devices, Fingerprints, Phones)
+    match /blocked_entities/{entityId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Labels Collection (WhatsApp Business style chat labels for counselors)
+    match /labels/{labelId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Conversations Collection - Support full chat lifecycle including deletion
+    match /conversations/{conversationId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if true;
+
+      // Messages Subcollection - Support message sending, updates and single-message deletion
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if isNotBlocked(request.resource.data.senderId);
+        allow update: if true;
+        allow delete: if true;
+      }
+    }
+
+    // Level Chats Collection - Groups created by Counselors
+    match /level_chats/{levelChatId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+
+      // Level Chat Messages
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if isNotBlocked(request.resource.data.senderId);
+        allow update, delete: if true;
+      }
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Settings & System Configuration (Social links, auto push config)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Broadcast Notifications (Push notifications sent to all users and counselors)
+    match /broadcast_notifications/{notificationId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

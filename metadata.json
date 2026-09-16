@@ -1,0 +1,10 @@
+{
+  "name": "Unity Earning Live Chat",
+  "description": "A lightweight, fast, and real-time messaging web application optimized for slow connections and mobile devices.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
