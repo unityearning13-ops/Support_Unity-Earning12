@@ -157,11 +157,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
         const q = query(usersRef, where('phone', '==', formattedPhone), limit(1));
         const querySnap = await getDocs(q);
 
-        // Check system security setting for multi-account restriction per device
+        // Check system security setting for multi-account restriction per device and single-use phone lock
         const configSnap = await getDoc(doc(db, 'settings', 'systemConfig'));
         const blockMultiDevice = configSnap.exists()
           ? (configSnap.data().blockMultipleAccountsPerDevice ?? true)
           : true;
+
+        const singleUsePhoneLock = configSnap.exists()
+          ? Boolean(configSnap.data().singleUsePhoneLock)
+          : false;
 
         // Check if this device is already used by another phone number
         let isDeviceAlreadyUsed = false;
@@ -199,6 +203,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
           if (existing.isBlocked) {
             setErrorMessage('আপনার একাউন্টটি স্থগিত রয়েছে।');
+            setLoading(false);
+            return;
+          }
+
+          if (singleUsePhoneLock) {
+            setErrorMessage('এই নাম্বারটিতে ইতিমধ্যে অ্যাকাউন্ট রয়েছে। (এক নাম্বার দিয়ে শুধুমাত্র একবারই রেজিস্ট্রেশন করা যাবে, দ্বিতীয়বার লগইন করা যাবে না)।');
             setLoading(false);
             return;
           }

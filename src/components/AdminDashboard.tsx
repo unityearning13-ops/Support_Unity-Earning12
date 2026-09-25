@@ -122,6 +122,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [companyLogoUrl, setCompanyLogoUrl] = useState(initialLogoUrl);
   const [blockMultipleAccountsPerDevice, setBlockMultipleAccountsPerDevice] = useState(true);
+  const [singleUsePhoneLock, setSingleUsePhoneLock] = useState(false);
   const [unblockAllUsers, setUnblockAllUsers] = useState(false);
   const [unblockAllToggling, setUnblockAllToggling] = useState(false);
   const [unblockAllDbLoading, setUnblockAllDbLoading] = useState(false);
@@ -183,6 +184,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.blockMultipleAccountsPerDevice !== undefined) {
             setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
           }
+          if (cfg.singleUsePhoneLock !== undefined) {
+            setSingleUsePhoneLock(Boolean(cfg.singleUsePhoneLock));
+          }
           if (cfg.unblockAllUsers !== undefined) {
             setUnblockAllUsers(Boolean(cfg.unblockAllUsers));
           }
@@ -213,6 +217,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.companyLogoUrl !== undefined) setCompanyLogoUrl(cfg.companyLogoUrl);
           if (cfg.blockMultipleAccountsPerDevice !== undefined) {
             setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
+          }
+          if (cfg.singleUsePhoneLock !== undefined) {
+            setSingleUsePhoneLock(Boolean(cfg.singleUsePhoneLock));
           }
           if (cfg.unblockAllUsers !== undefined) {
             setUnblockAllUsers(Boolean(cfg.unblockAllUsers));
@@ -716,6 +723,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           youtubeVideoUrl: youtubeVideoUrl.trim(),
           companyLogoUrl: companyLogoUrl.trim(),
           blockMultipleAccountsPerDevice: blockMultipleAccountsPerDevice,
+          singleUsePhoneLock: singleUsePhoneLock,
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
@@ -1933,6 +1941,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {blockMultipleAccountsPerDevice
                     ? 'সিকিউরিটি অপশন ON আছে। একই ডিভাইস থেকে একাধিক নতুন অ্যাকাউন্ট খোলা বন্ধ থাকবে।'
                     : 'সিকিউরিটি অপশন OFF আছে। একই ডিভাইস থেকে একাধিক অ্যাকাউন্ট খোলা যাবে।'}
+                </span>
+              </div>
+            </div>
+
+            {/* SECURITY TOGGLE CARD: Single-Use Phone Lock */}
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl ${singleUsePhoneLock ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-700/50 text-slate-400'}`}>
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-white">
+                      এক নম্বর দিয়ে কেবল একবার রেজিস্ট্রেশন ও লগইন লক (Single-Use Phone Lock)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {singleUsePhoneLock
+                        ? 'চালু (ON): এক নাম্বার দিয়ে শুধুমাত্র একবারই রেজিস্ট্রেশন করা যাবে। লগআউট করার পর ওই নম্বর দিয়ে দ্বিতীয়বার লগইন করা যাবে না (মেসেজ দেখাবে: "এই নাম্বারটিতে ইতিমধ্যে অ্যাকাউন্ট রয়েছে")।'
+                        : 'বন্ধ (OFF): ইউজার লগআউট করার পর ওই নম্বর দিয়ে বারবার লগইন করতে পারবে এবং আগের চ্যাট দেখতে পারবে।'}
+                    </p>
+                  </div>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={singleUsePhoneLock}
+                    onChange={(e) => setSingleUsePhoneLock(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+
+              <div className="text-[11px] font-medium pt-1 border-t border-indigo-500/20 flex items-center gap-1.5 text-indigo-300">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {singleUsePhoneLock
+                    ? 'অন (ON): একই ফোন নম্বর দিয়ে দ্বিতীয়বার রি-রেজিস্ট্রেশন বা লগইন করা সম্পূর্ণ বন্ধ থাকবে।'
+                    : 'অফ (OFF): একই ফোন নম্বর দিয়ে বারবার লগইন করা যাবে।'}
                 </span>
               </div>
             </div>
