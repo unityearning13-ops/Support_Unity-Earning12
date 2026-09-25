@@ -450,34 +450,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3.5 sm:p-4 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070b0e]/90 p-3.5 sm:p-6 backdrop-blur-sm overflow-y-auto">
       <div
         id="auth-card"
-        className="w-full max-w-sm sm:max-w-md rounded-3xl bg-white p-5 sm:p-7 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto"
+        className="w-full max-w-sm sm:max-w-md my-auto rounded-3xl bg-[#111b21] p-6 sm:p-8 shadow-2xl border border-[#222d34] animate-in fade-in zoom-in-95 duration-150 max-h-[94vh] overflow-y-auto text-slate-100"
       >
         {/* Header */}
         <div className="text-center">
           {companyLogoUrl ? (
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md">
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden border border-[#222d34] bg-[#202c33] shadow-md">
               <img src={companyLogoUrl} alt="Company Logo" className="h-full w-full object-cover" />
             </div>
           ) : (
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-600 via-teal-600 to-emerald-500 text-white shadow-md">
-              <MessageSquare className="h-7 w-7" />
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#00a884] text-slate-950 font-black shadow-lg shadow-[#00a884]/20">
+              <MessageSquare className="h-7 w-7 text-white" />
             </div>
           )}
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
             Unity Earning Live Chat
           </h1>
-          <p className="mt-1 text-xs text-slate-500 font-medium">
+          <p className="mt-1 text-xs text-slate-400 font-medium">
             {isReferralLink
               ? 'লাইভ মেসেজিং ও সেমিনার পোর্টাল'
               : 'কাউন্সিলর ও এডমিন লগইন পোর্টাল'}
           </p>
 
           {!isReferralLink && (
-            <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">
-              <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
+            <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-[#202c33] border border-[#222d34] px-3 py-1 text-[11px] font-semibold text-slate-300">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#00a884]" />
               <span>শুধুমাত্র কাউন্সিলর ও এডমিন এক্সেস</span>
             </div>
           )}
@@ -485,19 +485,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
         {/* Directly Embedded YouTube Video Player Container: ONLY shown if arriving through referral link */}
         {isReferralLink && (
-          <div className="mt-3.5 space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-800 px-1">
-              <span className="flex items-center gap-1.5 text-red-600 font-black">
-                <Youtube className="h-4 w-4 fill-red-600 text-red-600 animate-pulse" />
+          <div className="mt-4 space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-200 px-1">
+              <span className="flex items-center gap-1.5 text-red-400 font-bold">
+                <Youtube className="h-4 w-4 fill-red-500 text-red-500" />
                 <span>সাপোর্ট ভিডিও</span>
               </span>
-              <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-black border border-red-200 flex items-center gap-1">
-                <span className="h-2 w-2 rounded-full bg-red-600 animate-ping inline-block" />
+              <span className="text-[10px] bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full font-bold border border-red-500/30 flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping inline-block" />
                 <span>ভিডিও প্লে করুন ▶</span>
               </span>
             </div>
 
-            <div className="relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-red-500/60 shadow-xl bg-black group">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-red-500/40 shadow-xl bg-black group">
               {getYouTubeEmbedUrl(youtubeVideoUrl) ? (
                 <iframe
                   src={getYouTubeEmbedUrl(youtubeVideoUrl)!}
@@ -507,15 +507,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                   allowFullScreen
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-950 via-slate-900 to-red-900 text-white p-4 text-center">
-                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-xl shadow-red-600/50 mb-2">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[#182229] text-white p-4 text-center">
+                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white shadow-xl mb-2">
                     <Youtube className="h-6 w-6 fill-white text-white" />
                   </div>
-                  <span className="text-xs sm:text-sm font-black text-white">
+                  <span className="text-xs sm:text-sm font-bold text-white">
                     ভিডিও লিংক লোড হচ্ছে...
                   </span>
-                  <span className="text-[10px] text-red-200 mt-1 font-medium">
-                    (এডমিন সেটিংসে ইউটিউব ভিডিও লিংক যুক্ত করলে ভিডিওটি এখানে সরাসরি চলবে)
+                  <span className="text-[10px] text-slate-400 mt-1 font-medium">
+                    (এডমিন সেটিংসে ইউটিউব ভিডিও লিংক যুক্ত করলে ভিডিওটি সরাসরি চলবে)
                   </span>
                 </div>
               )}
@@ -525,9 +525,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
         {/* Assigned Counselor Card Header: ONLY shown if arriving through counselor referral link */}
         {isReferralLink && counselorInfo && (
-          <div className="mt-3.5 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 to-sky-50/60 p-3 shadow-2xs">
+          <div className="mt-4 rounded-2xl border border-teal-700/40 bg-[#182a32] p-3.5 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-teal-500 bg-teal-100 flex items-center justify-center font-bold text-teal-800 text-sm shadow-xs">
+              <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-[#00a884] bg-[#202c33] flex items-center justify-center font-bold text-teal-300 text-sm shadow-xs">
                 {counselorInfo.photoURL ? (
                   <img
                     src={counselorInfo.photoURL}
@@ -537,29 +537,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                 ) : (
                   counselorInfo.name.charAt(0).toUpperCase()
                 )}
-                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#111b21] bg-[#00a884]" />
               </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-teal-900 truncate">
+                  <span className="text-xs sm:text-sm font-bold text-white truncate">
                     {counselorInfo.name}
                   </span>
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-teal-200/80 px-1.5 py-0.2 text-[9px] font-bold text-teal-900">
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 border border-[#00a884]/40 px-1.5 py-0.2 text-[9px] font-bold text-teal-300">
                     <ShieldCheck className="h-2.5 w-2.5" />
                     <span>কাউন্সিলর</span>
                   </span>
                 </div>
-                <p className="mt-0.5 text-[11px] font-medium text-teal-700 leading-snug">
+                <p className="mt-0.5 text-[11px] font-medium text-teal-400 leading-snug">
                   আপনার দায়িত্বপ্রাপ্ত কাউন্সিলর
                 </p>
               </div>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-teal-200/70 flex items-start gap-1.5 text-[11px] text-teal-800 leading-snug font-medium">
-              <GraduationCap className="h-3.5 w-3.5 shrink-0 text-teal-600 mt-0.5" />
+            <div className="mt-2.5 pt-2 border-t border-[#222d34] flex items-start gap-1.5 text-[11px] text-slate-300 leading-snug font-medium">
+              <GraduationCap className="h-3.5 w-3.5 shrink-0 text-[#00a884] mt-0.5" />
               <span>
-                কাজ করতে হলে নিচে নাম ও নাম্বার দিয়ে কাউন্সিলরের সাথে সরাসরি চ্যাট করুন।
+                কাজ শিখতে ও শুরু করতে নিচে নাম ও নাম্বার দিয়ে কাউন্সিলরের সাথে সরাসরি যুক্ত হোন।
               </span>
             </div>
           </div>
@@ -567,8 +567,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
         {/* Seminar Notice */}
         {isReferralLink && (
-          <div className="mt-3 rounded-xl border border-sky-200 bg-sky-50/80 p-2.5 text-center shadow-2xs">
-            <p className="text-xs font-semibold text-sky-900 leading-tight">
+          <div className="mt-3 rounded-xl border border-sky-500/30 bg-sky-950/40 p-2.5 text-center shadow-xs">
+            <p className="text-xs font-semibold text-sky-200 leading-tight">
               চ্যাটে যুক্ত হয়ে সরাসরি ফ্রি সেমিনারে অংশ নিতে পারবেন।
             </p>
           </div>
@@ -576,25 +576,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
         {/* Error Alert */}
         {errorMessage && (
-          <div className="mt-3.5 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 animate-shake">
+          <div className="mt-3.5 rounded-2xl border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200 animate-shake">
             <div className="flex items-start gap-2">
-              <ShieldAlert className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <ShieldAlert className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
               <div className="leading-relaxed">{errorMessage}</div>
             </div>
           </div>
         )}
 
-        {/* Direct Form with PROMINENT, CLEAR input fields */}
+        {/* Direct Form with CLEAR input fields */}
         <form onSubmit={handleSubmit} className="mt-4 space-y-3.5">
-          <div className="rounded-2xl border-2 border-teal-500/80 bg-white p-3.5 shadow-md shadow-teal-500/10 space-y-3.5">
+          <div className="rounded-2xl border border-[#222d34] bg-[#182229] p-4 space-y-3.5">
             {/* Referral Mode: Full Name Input first */}
             {isReferralLink && (
               <div>
-                <label className="block text-xs font-extrabold text-slate-800 mb-1 flex items-center gap-1">
-                  <span>আপনার নাম লিখুন</span> <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-200 mb-1 flex items-center gap-1">
+                  <span>আপনার নাম লিখুন</span> <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-600" />
+                  <UserIcon className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-400" />
                   <input
                     id="login-name-input"
                     type="text"
@@ -603,7 +603,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                     placeholder="যেমন: মোঃ সাকিব হাসান"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-xl border-2 border-slate-300 bg-white py-3 pl-10 pr-3 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-500/20 focus:outline-none transition shadow-2xs"
+                    className="w-full rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 pl-10 pr-3 text-sm font-medium text-white placeholder:text-slate-500 focus:border-[#00a884] focus:ring-1 focus:ring-[#00a884] focus:outline-none transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -611,11 +611,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
 
             {/* Phone Field */}
             <div>
-              <label className="block text-xs font-extrabold text-slate-800 mb-1 flex items-center gap-1">
-                <span>মোবাইল / হোয়াটসঅ্যাপ নাম্বার</span> <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-200 mb-1 flex items-center gap-1">
+                <span>মোবাইল / হোয়াটসঅ্যাপ নাম্বার</span> <span className="text-red-400">*</span>
               </label>
               <div className="relative">
-                <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-600" />
+                <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-400" />
                 <input
                   id="login-phone-input"
                   type="tel"
@@ -624,7 +624,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                   placeholder="যেমন: 01XXXXXXXXX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border-2 border-slate-300 bg-white py-3 pl-10 pr-3 text-sm font-extrabold text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-500/20 focus:outline-none transition shadow-2xs font-mono"
+                  className="w-full rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 pl-10 pr-3 text-sm font-bold text-white placeholder:text-slate-500 focus:border-[#00a884] focus:ring-1 focus:ring-[#00a884] focus:outline-none transition shadow-2xs font-mono tabular-nums"
                 />
               </div>
             </div>
@@ -632,11 +632,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
             {/* Password / PIN Field: ONLY in Main Link Mode for Counselors & Admins */}
             {!isReferralLink && (
               <div>
-                <label className="block text-xs font-extrabold text-slate-800 mb-1 flex items-center gap-1">
-                  <span>পাসওয়ার্ড / পিন</span> <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-200 mb-1 flex items-center gap-1">
+                  <span>পাসওয়ার্ড / পিন</span> <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <Key className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-600" />
+                  <Key className="absolute left-3.5 top-3.5 h-4 w-4 text-teal-400" />
                   <input
                     id="login-password-input"
                     type={showPassword ? 'text' : 'password'}
@@ -644,12 +644,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                     placeholder="আপনার পাসওয়ার্ড বা পিন লিখুন"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border-2 border-slate-300 bg-white py-3 pl-10 pr-10 text-sm font-extrabold text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-500/20 focus:outline-none transition shadow-2xs font-mono"
+                    className="w-full rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 pl-10 pr-10 text-sm font-bold text-white placeholder:text-slate-500 focus:border-[#00a884] focus:ring-1 focus:ring-[#00a884] focus:outline-none transition shadow-2xs font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-500 hover:text-slate-800 transition p-0.5"
+                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition p-0.5 cursor-pointer"
                     title={showPassword ? 'পাসওয়ার্ড লুকান' : 'পাসওয়ার্ড দেখুন'}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -664,11 +664,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
             id="login-submit-btn"
             type="submit"
             disabled={loading}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-teal-600 via-emerald-600 to-sky-600 py-3.5 text-sm font-black text-white shadow-lg shadow-teal-600/30 hover:opacity-95 active:scale-[0.98] disabled:opacity-50 transition cursor-pointer"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#00a884] hover:bg-[#008f72] py-3 text-sm font-bold text-slate-950 shadow-md shadow-[#00a884]/20 active:scale-[0.98] disabled:opacity-50 transition cursor-pointer"
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-slate-950" />
                 <span>যাচাই করা হচ্ছে...</span>
               </>
             ) : (
@@ -676,15 +676,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, targetCounselor
                 <span>
                   {isReferralLink ? 'কাউন্সিলরের সাথে চ্যাটে যুক্ত হোন' : 'লগইন করুন'}
                 </span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 text-slate-950" />
               </>
             )}
           </button>
         </form>
 
         {/* Footnote */}
-        <div className="mt-4 border-t border-slate-100 pt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-          <Lock className="h-3 w-3 text-slate-400" />
+        <div className="mt-4 border-t border-[#222d34] pt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+          <Lock className="h-3 w-3 text-teal-400" />
           <span>নিরাপদ ও এনক্রিপ্টেড কমিউনিকেশন পোর্টাল</span>
         </div>
       </div>

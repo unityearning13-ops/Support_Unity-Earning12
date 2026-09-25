@@ -621,7 +621,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
           <button
             id="chat-back-btn"
             onClick={onBack}
-            className="md:hidden flex h-8 w-8 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 transition cursor-pointer shrink-0"
+            className="md:hidden flex h-8 w-8 items-center justify-center rounded-xl text-slate-300 hover:bg-[#202c33] hover:text-white transition cursor-pointer shrink-0"
             title="ফিরে যান"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -690,20 +690,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
           </div>
         </div>
 
-        {/* Header Action Buttons: Uniform 32x32px buttons */}
-        <div className="flex items-center gap-1 shrink-0">
+        {/* Header Action Buttons: Uniform buttons */}
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {/* Label Management button */}
           {currentUser.isCounselor && (
             <button
               onClick={() => setShowLabelModal(true)}
               className={`flex h-8 items-center gap-1 rounded-xl border px-2 sm:px-2.5 text-xs font-semibold transition cursor-pointer ${
                 conversation.labels && conversation.labels.length > 0
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-2xs'
-                  : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                  ? 'bg-[#00a884]/20 border-[#00a884]/40 text-[#00a884] hover:bg-[#00a884]/30'
+                  : 'border-[#222d34] bg-[#202c33] hover:bg-[#2a3942] text-slate-300'
               }`}
               title="লেবেল সেট করুন"
             >
-              <Tag className={`h-3.5 w-3.5 ${conversation.labels && conversation.labels.length > 0 ? 'text-emerald-600 fill-emerald-600' : 'text-teal-600'}`} />
+              <Tag className={`h-3.5 w-3.5 ${conversation.labels && conversation.labels.length > 0 ? 'text-[#00a884] fill-[#00a884]' : 'text-teal-400'}`} />
               <span className="hidden sm:inline">লেবেল</span>
             </button>
           )}
@@ -712,17 +712,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
           <button
             id="chat-audio-call-btn"
             onClick={() => onStartCall(otherUserObj)}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200/70 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 transition cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#222d34] bg-[#202c33] hover:bg-[#2a3942] text-slate-300 hover:text-white transition cursor-pointer"
             title="ভয়েস কল"
           >
-            <Phone className="h-4 w-4" />
+            <Phone className="h-4 w-4 text-[#00a884]" />
           </button>
 
           {/* Delete entire chat (Counselor or Admin only) */}
           {(currentUser.isCounselor || currentUser.uid === 'admin') && (
             <button
               onClick={() => setShowDeleteConvModal(true)}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200/70 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 transition cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#222d34] bg-[#202c33] hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition cursor-pointer"
               title="সম্পূর্ণ চ্যাট মুছে ফেলুন"
             >
               <Trash2 className="h-4 w-4" />
@@ -733,33 +733,31 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
 
       {/* Prominent Counselor Guidance Banner for Students */}
       {isOtherCounselor && (
-        <div className="bg-gradient-to-r from-teal-600 via-sky-600 to-teal-700 px-3.5 py-1.5 text-white text-[11px] sm:text-xs shadow-2xs flex items-center justify-between shrink-0">
+        <div className="bg-gradient-to-r from-teal-900 via-teal-800 to-emerald-900 border-b border-teal-700/50 px-3.5 py-1.5 text-white text-[11px] sm:text-xs shadow-xs flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 font-medium min-w-0">
-            <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+            <GraduationCap className="h-3.5 w-3.5 text-[#00a884] shrink-0" />
             <span className="truncate">
-              <strong>আপনার কাউন্সিলর:</strong> স্পেশাল সেমিনার ও হেল্প পেতে কথা বলুন।
+              <strong className="text-teal-200">আপনার দায়িত্বপ্রাপ্ত কাউন্সিলর:</strong> লাইভ সেমিনার ও যেকোনো সহায়তায় কথা বলুন।
             </span>
           </div>
-          <span className="hidden md:inline-block rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold shrink-0">
+          <span className="hidden md:inline-block rounded-full bg-[#00a884]/20 border border-[#00a884]/30 px-2 py-0.5 text-[10px] font-bold text-teal-300 shrink-0">
             অফিশিয়াল সহায়তা
           </span>
         </div>
       )}
 
-
-
       {/* 2. Messages Thread Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#0b141a]">
         {/* Load older messages button */}
         {hasMore && (
           <div className="flex justify-center py-1">
             <button
               onClick={handleLoadOlder}
               disabled={loadingOlder}
-              className="flex items-center gap-1.5 rounded-full bg-white/90 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 shadow-2xs hover:bg-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-full bg-[#202c33] border border-[#222d34] px-3 py-1 text-xs font-semibold text-slate-200 shadow-sm hover:bg-[#2a3942] transition cursor-pointer"
             >
               {loadingOlder ? (
-                <Loader2 className="h-3 w-3 animate-spin text-sky-600" />
+                <Loader2 className="h-3 w-3 animate-spin text-[#00a884]" />
               ) : null}
               <span>আগের মেসেজ দেখুন</span>
             </button>
@@ -768,15 +766,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
 
         {loading ? (
           <div className="flex items-center justify-center py-10">
-            <Loader2 className="h-6 w-6 animate-spin text-sky-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-[#00a884]" />
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#202c33] text-[#00a884] mb-3 border border-[#222d34]">
               <GraduationCap className="h-6 w-6" />
             </div>
-            <p className="text-xs font-semibold text-slate-700">কথোপকথন শুরু করুন</p>
-            <p className="mt-0.5 text-[11px] text-slate-400 max-w-xs">
+            <p className="text-sm font-bold text-white">কথোপকথন শুরু করুন</p>
+            <p className="mt-1 text-xs text-slate-400 max-w-xs leading-relaxed">
               সেমিনারের তথ্য ও ক্যারিয়ার পরামর্শ জানতে এখনই নিচে মেসেজ লিখুন।
             </p>
           </div>
@@ -1158,15 +1156,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
 
       {/* Delete Conversation Confirmation Modal */}
       {showDeleteConvModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-xs rounded-3xl bg-white p-5 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 mb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-xs rounded-3xl bg-[#111b21] p-6 shadow-2xl border border-[#222d34] animate-in fade-in zoom-in-95 text-slate-100">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/15 border border-red-500/30 text-rose-400 mb-3">
               <Trash2 className="h-6 w-6" />
             </div>
-            <h3 className="text-center text-sm font-bold text-slate-900">
+            <h3 className="text-center text-sm font-bold text-white">
               সম্পূর্ণ চ্যাট মুছে ফেলতে চান?
             </h3>
-            <p className="mt-1 text-center text-xs text-slate-500 leading-relaxed">
+            <p className="mt-1.5 text-center text-xs text-slate-400 leading-relaxed">
               এই কথোপকথনের সমস্ত মেসেজ ও ছবি স্থায়ীভাবে ডিলিট হয়ে যাবে।
             </p>
 
@@ -1174,7 +1172,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => setShowDeleteConvModal(false)}
-                className="flex-1 rounded-xl border border-slate-200 bg-white py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                className="flex-1 rounded-xl border border-[#222d34] bg-[#202c33] py-2 text-xs font-semibold text-slate-300 hover:bg-[#2a3942] transition cursor-pointer"
               >
                 বাতিল
               </button>
@@ -1182,7 +1180,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = React.memo(({
                 type="button"
                 disabled={deleteConvLoading}
                 onClick={handleDeleteConversation}
-                className="flex-1 rounded-xl bg-red-600 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition cursor-pointer shadow-xs"
+                className="flex-1 rounded-xl bg-red-600 py-2 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50 transition cursor-pointer shadow-xs"
               >
                 {deleteConvLoading ? 'ডিলিট হচ্ছে...' : 'ডিলিট করুন'}
               </button>

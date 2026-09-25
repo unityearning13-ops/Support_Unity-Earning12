@@ -348,6 +348,85 @@ export const unblockUserAndDevice = async (
 };
 
 /**
+ * Set Global Unblock Mode in system settings.
+ * When enabled (true), all blocks are bypassed so all users can use the app and referral links.
+ * When disabled (false), normal blocking rules apply and blocked users cannot use the app.
+ */
+export const setGlobalUnblockMode = async (enabled: boolean): Promise<void> => {
+  await setDoc(
+    doc(db, 'settings', 'systemConfig'),
+    {
+      unblockAllUsers: enabled,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true }
+  );
+};
+
+/**
+ * Unblock ALL users and wipe all blocked entities (IPs, devices, fingerprints, UIDs).
+ * Used by admin to completely clear all blocks in the database at once.
+ */
+export const unblockAllUsersAndEntities = async (
+  unblockedBy = 'চিফ এডমিন'
+): Promise<{ unblockedUsersCount: number; clearedEntitiesCount: number }> => {
+  const now = new Date().toISOString();
+  let unblockedUsersCount = 0;
+  let clearedEntitiesCount = 0;
+
+  // 1. Unblock all blocked users in 'users' collection
+  try {
+    const qBlockedUsers = query(collection(db, 'users'), where('isBlocked', '==', true));
+    const userSnaps = await getDocs(qBlockedUsers);
+    await Promise.all(
+      userSnaps.docs.map(async (userDoc) => {
+        try {
+          await updateDoc(doc(db, 'users', userDoc.id), {
+            isBlocked: false,
+            unblockedAt: now,
+            unblockedBy: unblockedBy || 'Admin',
+            blockedReason: null,
+            blockedAt: null,
+            blockedBy: null,
+          });
+          unblockedUsersCount++;
+        } catch (err) {
+          console.warn('Error unblocking user', userDoc.id, err);
+        }
+      })
+    );
+  } catch (err) {
+    console.warn('Error querying blocked users:', err);
+  }
+
+  // 2. Delete all docs in 'blocked_entities'
+  try {
+    const entitiesSnaps = await getDocs(collection(db, 'blocked_entities'));
+    await Promise.all(
+      entitiesSnaps.docs.map(async (entityDoc) => {
+        try {
+          await deleteDoc(doc(db, 'blocked_entities', entityDoc.id));
+          clearedEntitiesCount++;
+        } catch (err) {
+          console.warn('Error deleting blocked entity', entityDoc.id, err);
+        }
+      })
+    );
+  } catch (err) {
+    console.warn('Error clearing blocked entities:', err);
+  }
+
+  // 3. Clear local device/fingerprint cache
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('ue_fp_hash');
+    }
+  } catch {}
+
+  return { unblockedUsersCount, clearedEntitiesCount };
+};
+
+/**
  * Real-time listener for blocked entities.
  * Returns unsubscribe function.
  */
@@ -395,10 +474,28 @@ export const isVisitorBlocked = async (
   matchedEntity?: BlockedEntity;
 }> => {
   try {
+    // Admin is never blocked
+    if (targetUid === 'admin_root') {
+      return { isBlocked: false };
+    }
+
     const deviceId = extraIdentifiers?.deviceId || getDeviceId();
     const fingerprint = extraIdentifiers?.fingerprint || (await getClientFingerprint());
     const ip = extraIdentifiers?.ip || (await getClientIp());
     const cleanPhone = cleanPhoneVal(extraIdentifiers?.phone || '');
+
+    // Global Unblock check: if admin turned on Unblock All Users
+    try {
+      const configSnap = await getDoc(doc(db, 'settings', 'systemConfig'));
+      if (configSnap.exists()) {
+        const cfg = configSnap.data();
+        if (cfg.unblockAllUsers === true) {
+          return { isBlocked: false, ipAddress: ip, deviceId };
+        }
+      }
+    } catch (err) {
+      console.warn('Global unblock check notice:', err);
+    }
 
     // List of candidate blocked_entities document IDs
     const candidateDocIds: string[] = [];
@@ -516,6 +613,10 @@ export const checkIsVisitorBlockedSync = (
   },
   blockedEntities: BlockedEntity[]
 ): { isBlocked: boolean; matchedEntity?: BlockedEntity } => {
+  if (identifiers.uid === 'admin_root') {
+    return { isBlocked: false };
+  }
+
   if (!blockedEntities || blockedEntities.length === 0) {
     return { isBlocked: false };
   }

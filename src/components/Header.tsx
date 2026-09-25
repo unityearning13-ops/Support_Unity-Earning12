@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
     <>
       <header
         id="main-header"
-        className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-[#222d34] bg-[#111b21] px-2.5 sm:px-4 shadow-md shrink-0 text-white"
+        className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-[#222d34] bg-[#111b21] px-3 sm:px-4 shadow-sm shrink-0 text-white select-none"
       >
         {/* Brand Title */}
         <div className="flex items-center gap-2.5 min-w-0 shrink sm:shrink-0">
@@ -78,25 +78,25 @@ export const Header: React.FC<HeaderProps> = ({
                 Unity Earning Live Chat
               </h1>
               {currentUser?.isCounselor && (
-                <span className="hidden md:inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#00a884] shrink-0">
+                <span className="hidden md:inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 border border-[#00a884]/30 px-2 py-0.5 text-[9px] font-bold text-[#00a884] shrink-0">
                   <GraduationCap className="h-2.5 w-2.5" />
                   <span>কাউন্সিলর</span>
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-400 whitespace-nowrap">
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-slate-400 whitespace-nowrap">
               <span
-                className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                className={`h-2 w-2 rounded-full shrink-0 ${
                   isOnline ? 'bg-[#00a884] animate-pulse' : 'bg-red-500'
                 }`}
               />
-              <span>{isOnline ? 'অনলাইন' : 'অফলাইন'}</span>
+              <span className="text-slate-300">{isOnline ? 'অনলাইন' : 'অফলাইন'}</span>
             </div>
           </div>
         </div>
 
         {/* Header Actions */}
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <PWAInstallButton />
 
           {/* If logged in as Counselor: Counselor Dashboard & Quick share link */}
@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
               {onOpenCounselorDashboard && (
                 <button
                   onClick={onOpenCounselorDashboard}
-                  className="flex h-8 items-center gap-1 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-2.5 text-xs font-bold text-white shadow-2xs hover:from-teal-700 hover:to-emerald-700 transition cursor-pointer shrink-0"
+                  className="flex h-8 items-center gap-1 rounded-xl bg-gradient-to-r from-teal-600 to-[#00a884] px-2.5 text-xs font-bold text-white shadow-xs hover:opacity-95 transition cursor-pointer shrink-0"
                   title="কাউন্সিলর ড্যাশবোর্ড"
                 >
                   <GraduationCap className="h-3.5 w-3.5" />
@@ -117,12 +117,12 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={handleCopyCounselorLink}
                 className={`flex h-8 items-center gap-1 rounded-xl px-2 sm:px-2.5 text-xs font-bold transition cursor-pointer shrink-0 ${
                   linkCopied
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100'
+                    ? 'bg-[#00a884] text-slate-950 font-extrabold'
+                    : 'bg-[#202c33] text-teal-300 border border-[#222d34] hover:bg-[#2a3942]'
                 }`}
                 title="শেয়ার লিংক কপি করুন"
               >
-                {linkCopied ? <Check className="h-3.5 w-3.5" /> : <Link className="h-3.5 w-3.5 text-teal-600" />}
+                {linkCopied ? <Check className="h-3.5 w-3.5" /> : <Link className="h-3.5 w-3.5 text-teal-400" />}
                 <span className="hidden sm:inline">{linkCopied ? 'কপি হয়েছে!' : 'আমার লিংক'}</span>
               </button>
             </>
@@ -132,10 +132,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-add-contact-btn"
               onClick={onOpenAddContact}
-              className="flex h-8 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 px-2.5 text-xs font-semibold transition cursor-pointer shrink-0"
+              className="flex h-8 items-center gap-1.5 rounded-xl border border-[#222d34] bg-[#202c33] hover:bg-[#2a3942] text-slate-200 px-2.5 text-xs font-semibold transition cursor-pointer shrink-0"
               title="নতুন চ্যাট"
             >
-              <UserPlus className="h-3.5 w-3.5 text-sky-600" />
+              <UserPlus className="h-3.5 w-3.5 text-[#00a884]" />
               <span className="hidden md:inline">নতুন চ্যাট</span>
             </button>
           )}
@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-profile-btn"
               onClick={onOpenProfile}
-              className="relative flex h-8 w-8 items-center justify-center rounded-full overflow-hidden border border-slate-200 bg-slate-100 hover:ring-2 hover:ring-sky-500 transition cursor-pointer shrink-0"
+              className="relative flex h-8 w-8 items-center justify-center rounded-full overflow-hidden border border-[#222d34] bg-[#202c33] hover:ring-2 hover:ring-[#00a884] transition cursor-pointer shrink-0"
               title="আমার প্রোফাইল"
             >
               {currentUser.photoURL ? (
@@ -154,9 +154,9 @@ export const Header: React.FC<HeaderProps> = ({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <User className="h-4 w-4 text-slate-600" />
+                <User className="h-4 w-4 text-slate-300" />
               )}
-              <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-white bg-emerald-500" />
+              <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-[#111b21] bg-[#00a884]" />
             </button>
           )}
 
@@ -167,15 +167,15 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenAdmin}
               className={`flex h-8 items-center gap-1 rounded-xl px-2.5 text-xs font-semibold transition cursor-pointer shrink-0 ${
                 isAdminLoggedIn
-                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                  : 'border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  : 'border border-[#222d34] bg-[#202c33] hover:bg-[#2a3942] text-slate-300'
               }`}
               title={isAdminLoggedIn ? 'এডমিন ড্যাশবোর্ড' : 'এডমিন লগইন'}
             >
               {isAdminLoggedIn ? (
-                <ShieldCheck className="h-3.5 w-3.5 text-amber-600" />
+                <ShieldCheck className="h-3.5 w-3.5 text-amber-400" />
               ) : (
-                <Shield className="h-3.5 w-3.5 text-slate-500" />
+                <Shield className="h-3.5 w-3.5 text-slate-400" />
               )}
               <span className="hidden sm:inline">এডমিন</span>
             </button>
@@ -186,10 +186,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-logout-btn"
               onClick={() => setShowLogoutConfirm(true)}
-              className="flex h-8 items-center justify-center gap-1 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 px-2 sm:px-2.5 text-xs font-bold transition cursor-pointer shrink-0"
+              className="flex h-8 items-center justify-center gap-1 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2 sm:px-2.5 text-xs font-bold transition cursor-pointer shrink-0"
               title="লগআউট করুন"
             >
-              <LogOut className="h-3.5 w-3.5 text-red-600" />
+              <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">লগআউট</span>
             </button>
           )}
@@ -198,15 +198,15 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl border border-slate-100 space-y-4">
-            <div className="flex items-center gap-3 text-red-600">
-              <div className="rounded-full bg-red-100 p-2.5">
-                <LogOut className="h-6 w-6 text-red-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-sm rounded-2xl bg-[#111b21] p-5 shadow-2xl border border-[#222d34] space-y-4 text-slate-100">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="rounded-full bg-red-500/15 p-2.5 border border-red-500/30">
+                <LogOut className="h-5 w-5 text-red-400" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">লগআউট নিশ্চিতকরণ</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="text-sm font-bold text-white">লগআউট নিশ্চিতকরণ</h3>
+                <p className="text-xs text-slate-400">
                   আপনি কি নিশ্চিত যে আপনার একাউন্ট থেকে বের হতে চান?
                 </p>
               </div>
@@ -216,7 +216,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setShowLogoutConfirm(false)}
-                className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                className="rounded-xl border border-[#222d34] bg-[#202c33] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-[#2a3942] transition cursor-pointer"
               >
                 বাতিল
               </button>

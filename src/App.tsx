@@ -27,7 +27,7 @@ import { UnityBotChat } from './components/UnityBotChat';
 import { ChooseCounselor } from './components/ChooseCounselor';
 import { CompanyInfoDrawer } from './components/CompanyInfoDrawer';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
-import { MessageSquare, Sparkles, Loader2 } from 'lucide-react';
+import { MessageSquare, Sparkles, Loader2, Lock, Bot, Users } from 'lucide-react';
 import { sanitizeForFirestore } from './utils/sanitize';
 
 // Lazy loaded components for better performance
@@ -96,6 +96,7 @@ export default function App() {
   const [showProfile, setShowProfile] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showCounselorDashboard, setShowCounselorDashboard] = useState(false);
+  const [unblockAllUsers, setUnblockAllUsers] = useState<boolean>(false);
   const [adminToken, setAdminToken] = useState<string | null>(() => {
     return getStoredAdminToken();
   });
@@ -186,7 +187,7 @@ export default function App() {
 
   const targetCounselorFromUrl = getReferralCounselorFromUrl();
 
-  // Real-time systemConfig listener for WhatsApp & Telegram links
+  // Real-time systemConfig listener for WhatsApp & Telegram links and Global Unblock
   useEffect(() => {
     const unsub = onSnapshot(
       doc(db, 'settings', 'systemConfig'),
@@ -198,6 +199,14 @@ export default function App() {
           if (data.facebookPageUrl) setFacebookPageUrl(data.facebookPageUrl);
           if (data.supportEmail) setSupportEmail(data.supportEmail);
           if (data.companyLogoUrl !== undefined) setCompanyLogoUrl(data.companyLogoUrl);
+
+          if (data.unblockAllUsers !== undefined) {
+            const isUnblock = Boolean(data.unblockAllUsers);
+            setUnblockAllUsers(isUnblock);
+            if (isUnblock) {
+              setVisitorBlockedData(null);
+            }
+          }
         }
       },
       (err) => console.warn('System config load notice:', err)
@@ -222,13 +231,30 @@ export default function App() {
           }
         }
 
-        // Security check: Check if this visitor's device, hardware fingerprint, or IP is blocked
-        const blockStatus = await isVisitorBlocked(targetUid || undefined);
-        if (blockStatus.isBlocked) {
-          setVisitorBlockedData(blockStatus);
-          setCurrentUser(null);
-          setAuthInitialized(true);
-          return;
+        // Global unblock check first
+        let isUnblockAllActive = false;
+        try {
+          const cfgSnap = await getDoc(doc(db, 'settings', 'systemConfig'));
+          if (cfgSnap.exists()) {
+            isUnblockAllActive = Boolean(cfgSnap.data()?.unblockAllUsers);
+            setUnblockAllUsers(isUnblockAllActive);
+          }
+        } catch {}
+
+        if (!isUnblockAllActive) {
+          // Security check: Check if this visitor's device, hardware fingerprint, or IP is blocked
+          const blockStatus = await isVisitorBlocked(targetUid || undefined);
+          if (blockStatus.isBlocked) {
+            const token = getStoredAdminToken();
+            if (targetUid !== 'admin_root' && !token) {
+              setVisitorBlockedData(blockStatus);
+              setCurrentUser(null);
+              setAuthInitialized(true);
+              return;
+            }
+          }
+        } else {
+          setVisitorBlockedData(null);
         }
 
         // Fast UI load from localStorage if not blocked
@@ -699,20 +725,7 @@ export default function App() {
     );
   }
 
-  // If visitor is blocked (by IP, device ID, hardware fingerprint, or account)
-  if (visitorBlockedData?.isBlocked || currentUser?.isBlocked) {
-    return (
-      <BlockedScreen
-        userName={currentUser?.name}
-        ipAddress={visitorBlockedData?.ipAddress || currentUser?.ipAddress}
-        deviceId={visitorBlockedData?.deviceId || currentUser?.deviceId}
-        reason={visitorBlockedData?.reason || currentUser?.blockedReason}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  // DEDICATED ADMIN DASHBOARD: Direct full-screen management UI (no user chat, no bot, no chat list)
+  // DEDICATED ADMIN DASHBOARD: Direct full-screen management UI (admin is never blocked)
   if (currentUser?.uid === 'admin_root' || !!adminToken) {
     return (
       <React.Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#070b0e]"><Loader2 className="h-8 w-8 text-[#00a884] animate-spin" /></div>}>
@@ -722,6 +735,25 @@ export default function App() {
           onLogout={handleLogout}
         />
       </React.Suspense>
+    );
+  }
+
+  // If visitor is blocked (by IP, device ID, hardware fingerprint, or account)
+  // Only enforced if unblockAllUsers mode is NOT active!
+  if (!unblockAllUsers && (visitorBlockedData?.isBlocked || currentUser?.isBlocked)) {
+    return (
+      <BlockedScreen
+        userName={currentUser?.name}
+        ipAddress={visitorBlockedData?.ipAddress || currentUser?.ipAddress}
+        deviceId={visitorBlockedData?.deviceId || currentUser?.deviceId}
+        reason={visitorBlockedData?.reason || currentUser?.blockedReason}
+        onLogout={handleLogout}
+        onAdminUnlock={() => {
+          const token = sessionStorage.getItem('adminToken') || 'valid_admin';
+          setStoredAdminToken(token);
+          setAdminToken(token);
+        }}
+      />
     );
   }
 
@@ -765,7 +797,7 @@ export default function App() {
 
   return (
     <div className="flex h-[100dvh] w-full items-center justify-center bg-[#070b0e] overflow-hidden select-none">
-      <div className="relative flex h-[100dvh] w-full max-w-md flex-col overflow-hidden bg-[#111b21] font-sans text-slate-100 shadow-2xl border-x border-[#222d34]/60">
+      <div className="relative flex h-[100dvh] w-full md:max-w-6xl lg:max-w-7xl xl:max-w-[1500px] md:h-[96vh] md:my-auto md:rounded-2xl md:border md:border-[#222d34] overflow-hidden bg-[#111b21] font-sans text-slate-100 shadow-2xl">
         {/* Push Notification & Sound Banner (Floating at top) */}
         <TopNotificationBanner
           onOpenConversation={(convId) => {
@@ -781,113 +813,147 @@ export default function App() {
         {/* Offline Status & Slow connection banner */}
         <OfflineIndicator />
 
-        {/* Main Header (Hidden inside chat inbox) */}
-        {(!activeConversation && !activeLevelChat) && (
-          <Header
-            currentUser={currentUser}
-            companyLogoUrl={companyLogoUrl}
-            onOpenAddContact={() => setShowAddContact(true)}
-            onOpenProfile={() => setShowProfile(true)}
-            onOpenAdmin={() => setShowAdmin(true)}
-            onOpenCounselorDashboard={() => setShowCounselorDashboard(true)}
-            onOpenCompanyInfo={() => setShowCompanyDrawer(true)}
-            onLogout={handleLogout}
-            isAdminLoggedIn={!!adminToken}
-            isOnline={isOnline}
-          />
-        )}
+        {/* Main Responsive Two-Column Layout */}
+        <div className="flex h-full w-full overflow-hidden">
+          {/* Left Column: Header, ChatList, and BottomNav (on desktop stays side-by-side, on mobile shows when no active chat) */}
+          <div
+            className={`h-full w-full md:w-80 lg:w-[380px] md:shrink-0 flex flex-col md:border-r md:border-[#222d34] bg-[#111b21] transition-all overflow-hidden ${
+              activeConversation || activeLevelChat || activeBottomTab === 'bot' ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            {/* Header in Left Pane */}
+            <Header
+              currentUser={currentUser}
+              companyLogoUrl={companyLogoUrl}
+              onOpenAddContact={() => setShowAddContact(true)}
+              onOpenProfile={() => setShowProfile(true)}
+              onOpenAdmin={() => setShowAdmin(true)}
+              onOpenCounselorDashboard={() => setShowCounselorDashboard(true)}
+              onOpenCompanyInfo={() => setShowCompanyDrawer(true)}
+              onLogout={handleLogout}
+              isAdminLoggedIn={!!adminToken}
+              isOnline={isOnline}
+            />
 
-        {/* Chat Application Main Workspace */}
-        <main className={`flex-1 flex flex-col overflow-hidden ${activeConversation || activeLevelChat ? 'pb-0' : 'pb-16'}`}>
+            {/* ChatList Area */}
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              <ChatList
+                currentUserId={currentUser.uid}
+                currentUser={currentUser}
+                conversations={conversations}
+                activeConversationId={activeConversation?.id || null}
+                levelChats={levelChats}
+                activeLevelChatId={activeLevelChat?.id || null}
+                onSelectConversation={(conv) => {
+                  setActiveConversation(conv);
+                  setActiveLevelChat(null);
+                  requestNotificationPermission();
+                }}
+                onSelectLevelChat={(lChat) => {
+                  setActiveLevelChat(lChat);
+                  setActiveConversation(null);
+                  requestNotificationPermission();
+                }}
+                onDeleteConversation={handleDeleteConversation}
+                onOpenAddContact={() => setShowAddContact(true)}
+                onOpenCreateLevelChat={() => setShowCreateLevelChat(true)}
+                loading={conversationsLoading}
+                userPresenceMap={userPresenceMap}
+              />
+            </div>
 
-          {/* Messaging Layout OR Bot Chat Layout */}
-          {currentUser && (
-            activeBottomTab === 'bot' ? (
+            {/* Bottom Navigation */}
+            <BottomNav
+              activeTab={activeBottomTab}
+              onTabChange={setActiveBottomTab}
+              onOpenCompanyInfo={() => setShowCompanyDrawer(true)}
+              whatsappChannelUrl={whatsappChannelUrl}
+              telegramUrl={telegramUrl}
+              facebookPageUrl={facebookPageUrl}
+              supportEmail={supportEmail}
+              unreadCount={conversations.reduce((acc, c) => acc + (c.unreadCounts?.[currentUser.uid] || 0), 0)}
+            />
+          </div>
+
+          {/* Right Column: Active Chat Window, Bot Chat, or Desktop Welcome Screen */}
+          <div
+            className={`h-full flex-1 flex-col overflow-hidden bg-[#0b141a] relative ${
+              activeConversation || activeLevelChat || activeBottomTab === 'bot'
+                ? 'flex'
+                : 'hidden md:flex'
+            }`}
+          >
+            {activeLevelChat ? (
+              <LevelChatWindow
+                currentUser={currentUser}
+                levelChat={activeLevelChat}
+                onBack={() => setActiveLevelChat(null)}
+                onDeleteLevelChat={(deletedId) => {
+                  setLevelChats((prev) => prev.filter((c) => c.id !== deletedId));
+                  if (activeLevelChat?.id === deletedId) setActiveLevelChat(null);
+                }}
+              />
+            ) : activeConversation ? (
+              <ChatWindow
+                currentUser={currentUser}
+                conversation={activeConversation}
+                onBack={() => setActiveConversation(null)}
+                onDeleteConversation={handleDeleteConversation}
+                onStartCall={(contact) => {
+                  setActiveCallContact({ contact, isIncoming: false });
+                }}
+                contactPresence={
+                  userPresenceMap[
+                    activeConversation.participantIds.find((id) => id !== currentUser.uid) || ''
+                  ]
+                }
+              />
+            ) : activeBottomTab === 'bot' ? (
               <UnityBotChat onGoHome={() => setActiveBottomTab('home')} />
             ) : (
-              <div className="flex h-full w-full overflow-hidden">
-                {/* Conversations List Panel */}
-                <div
-                  className={`h-full w-full shrink-0 transition-all ${
-                    activeConversation || activeLevelChat ? 'hidden' : 'flex flex-col'
-                  }`}
-                >
-                  <ChatList
-                    currentUserId={currentUser.uid}
-                    currentUser={currentUser}
-                    conversations={conversations}
-                    activeConversationId={activeConversation?.id || null}
-                    levelChats={levelChats}
-                    activeLevelChatId={activeLevelChat?.id || null}
-                    onSelectConversation={(conv) => {
-                      setActiveConversation(conv);
-                      setActiveLevelChat(null);
-                      requestNotificationPermission();
-                    }}
-                    onSelectLevelChat={(lChat) => {
-                      setActiveLevelChat(lChat);
-                      setActiveConversation(null);
-                      requestNotificationPermission();
-                    }}
-                    onDeleteConversation={handleDeleteConversation}
-                    onOpenAddContact={() => setShowAddContact(true)}
-                    onOpenCreateLevelChat={() => setShowCreateLevelChat(true)}
-                    loading={conversationsLoading}
-                    userPresenceMap={userPresenceMap}
-                  />
-                </div>
+              /* WhatsApp Web Style Desktop Welcome Screen */
+              <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center select-none relative overflow-hidden bg-[#0b141a]">
+                {/* Subtle emerald ambient aura */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#00a884]/5 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-10 flex flex-col items-center max-w-sm">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#111b21] border border-[#222d34] text-[#00a884] shadow-xl mb-4">
+                    <MessageSquare className="h-8 w-8 text-[#00a884]" />
+                  </div>
+                  
+                  <h2 className="text-xl font-bold text-white tracking-tight">
+                    Unity Earning Live Chat
+                  </h2>
+                  <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                    বার্তা পাঠাতে বা দেখতে বাম পাশের তালিকা থেকে যেকোনো ইনবক্স অথবা কোর্স লেভেল গ্রুপ নির্বাচন করুন।
+                  </p>
 
-                {/* Active Chat Window Panel */}
-                <div
-                  className={`h-full w-full overflow-hidden ${
-                    activeConversation || activeLevelChat ? 'flex flex-col' : 'hidden'
-                  }`}
-                >
-                  {activeLevelChat ? (
-                    <LevelChatWindow
-                      currentUser={currentUser}
-                      levelChat={activeLevelChat}
-                      onBack={() => setActiveLevelChat(null)}
-                      onDeleteLevelChat={(deletedId) => {
-                        setLevelChats((prev) => prev.filter((c) => c.id !== deletedId));
-                        if (activeLevelChat?.id === deletedId) setActiveLevelChat(null);
-                      }}
-                    />
-                  ) : activeConversation ? (
-                    <ChatWindow
-                      currentUser={currentUser}
-                      conversation={activeConversation}
-                      onBack={() => setActiveConversation(null)}
-                      onDeleteConversation={handleDeleteConversation}
-                      onStartCall={(contact) => {
-                        setActiveCallContact({ contact, isIncoming: false });
-                      }}
-                      contactPresence={
-                        userPresenceMap[
-                          activeConversation.participantIds.find((id) => id !== currentUser.uid) || ''
-                        ]
-                      }
-                    />
-                  ) : null}
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      onClick={() => setActiveBottomTab('bot')}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#202c33] hover:bg-[#2a3942] text-slate-200 px-3 py-1.5 text-xs font-medium border border-[#222d34] transition cursor-pointer"
+                    >
+                      <Bot className="h-3.5 w-3.5 text-[#00a884]" />
+                      <span>স্মার্ট এআই বট</span>
+                    </button>
+                    <button
+                      onClick={() => setShowCompanyDrawer(true)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#202c33] hover:bg-[#2a3942] text-slate-200 px-3 py-1.5 text-xs font-medium border border-[#222d34] transition cursor-pointer"
+                    >
+                      <Users className="h-3.5 w-3.5 text-[#00a884]" />
+                      <span>কোম্পানি পরিচিতি</span>
+                    </button>
+                  </div>
+
+                  <div className="mt-10 inline-flex items-center gap-1.5 text-[11px] text-slate-400 font-medium bg-[#111b21] px-3 py-1.5 rounded-full border border-[#222d34]">
+                    <Lock className="h-3 w-3 text-[#00a884]" />
+                    <span>এন্ড-টু-এন্ড এনক্রিপ্টেড এবং সম্পূর্ণ সুরক্ষিত</span>
+                  </div>
                 </div>
               </div>
-            )
-          )}
-        </main>
-
-      {/* WhatsApp Style Bottom Navigation Bar (Hidden inside chat inbox) */}
-      {currentUser && !activeConversation && !activeLevelChat && (
-        <BottomNav
-          activeTab={activeBottomTab}
-          onTabChange={setActiveBottomTab}
-          onOpenCompanyInfo={() => setShowCompanyDrawer(true)}
-          whatsappChannelUrl={whatsappChannelUrl}
-          telegramUrl={telegramUrl}
-          facebookPageUrl={facebookPageUrl}
-          supportEmail={supportEmail}
-          unreadCount={conversations.reduce((acc, c) => acc + (c.unreadCounts?.[currentUser.uid] || 0), 0)}
-        />
-      )}
+            )}
+          </div>
+        </div>
 
       {/* Modals */}
       <React.Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"><Loader2 className="h-8 w-8 text-[#00a884] animate-spin" /></div>}>

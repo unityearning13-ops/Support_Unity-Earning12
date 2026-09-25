@@ -336,15 +336,15 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
           )}
 
           {/* Conversations List */}
-          <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2">
+          <div className="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-1.5">
             {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 border border-slate-100 rounded-xl animate-pulse">
-                    <div className="h-12 w-12 rounded-full bg-slate-200 shrink-0" />
+              <div className="space-y-2 p-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 border border-[#222d34] rounded-2xl bg-[#111b21] animate-pulse">
+                    <div className="h-12 w-12 rounded-full bg-[#202c33] shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 w-28 bg-slate-200 rounded" />
-                      <div className="h-2.5 w-44 bg-slate-100 rounded" />
+                      <div className="h-3 w-32 bg-[#202c33] rounded-md" />
+                      <div className="h-2.5 w-48 bg-[#202c33]/60 rounded-md" />
                     </div>
                   </div>
                 ))}
@@ -352,11 +352,11 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
             ) : sortedConversations.length === 0 ? (
               isCounselor ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center h-full">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 mb-2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#202c33] text-[#00a884] mb-3 border border-[#222d34]">
                     <MessageSquare className="h-6 w-6" />
                   </div>
-                  <p className="text-xs font-semibold text-slate-700">কোনো চ্যাট পাওয়া যায়নি</p>
-                  <p className="mt-1 text-[11px] text-slate-400 max-w-[220px]">
+                  <p className="text-sm font-bold text-slate-100">কোনো চ্যাট পাওয়া যায়নি</p>
+                  <p className="mt-1 text-xs text-slate-400 max-w-[240px] leading-relaxed">
                     {selectedLabelFilter !== 'all'
                       ? `"${selectedLabelFilter}" লেবেলে কোনো চ্যাট নেই।`
                       : 'মোবাইল নাম্বার দিয়ে স্টুডেন্ট খুঁজে যুক্ত করুন বা অপেক্ষা করুন।'}
@@ -364,7 +364,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                   {selectedLabelFilter !== 'all' ? (
                     <button
                       onClick={() => setSelectedLabelFilter('all')}
-                      className="mt-3 text-xs font-bold text-sky-600 hover:underline cursor-pointer"
+                      className="mt-3 text-xs font-bold text-[#00a884] hover:underline cursor-pointer"
                     >
                       সকল চ্যাট দেখুন
                     </button>
@@ -372,26 +372,26 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                     <button
                       id="empty-add-contact-btn"
                       onClick={onOpenAddContact}
-                      className="mt-3.5 flex items-center gap-1.5 rounded-xl bg-sky-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-sky-700 transition cursor-pointer"
+                      className="mt-4 flex items-center gap-1.5 rounded-xl bg-[#00a884] px-4 py-2 text-xs font-bold text-slate-950 shadow-sm hover:bg-[#008f72] transition cursor-pointer"
                     >
-                      <UserPlus className="h-3.5 w-3.5" />
+                      <UserPlus className="h-4 w-4" />
                       <span>নতুন যোগাযোগ যোগ করুন</span>
                     </button>
                   )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 text-center h-full">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#202c33] text-[#00a884] mb-3 border border-[#222d34]">
                     <MessageSquare className="h-6 w-6" />
                   </div>
-                  <p className="text-xs font-semibold text-slate-700">কোনো সক্রিয় চ্যাট নেই</p>
-                  <p className="mt-1 text-[11px] text-slate-400 max-w-[220px]">
-                    আপনার কোনো বার্তা থাকলে তা এখানে দেখতে পাবেন।
+                  <p className="text-sm font-bold text-slate-100">কোনো সক্রিয় চ্যাট নেই</p>
+                  <p className="mt-1 text-xs text-slate-400 max-w-[240px] leading-relaxed">
+                    আপনার কোনো বার্তা থাকলে তা এখানে পরিষ্কারভাবে দেখতে পাবেন।
                   </p>
                 </div>
               )
             ) : (
-              <div className="space-y-2 pb-2">
+              <div className="space-y-1.5 pb-2">
                 {sortedConversations.map((conv) => {
                   const other = getOtherParticipant(conv);
                   const isActive = conv.id === activeConversationId;
@@ -408,12 +408,12 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                       onTouchEnd={handleTouchEnd}
                       onMouseDown={() => handleTouchStart(conv)}
                       onMouseUp={handleTouchEnd}
-                      className={`group relative flex items-center justify-between p-3 border-b border-[#222d34] transition cursor-pointer ${
+                      className={`group relative flex items-center justify-between p-3 rounded-xl border transition cursor-pointer ${
                         isActive
-                          ? 'bg-[#2a3942]'
+                          ? 'bg-[#202c33] border-[#00a884]/60 shadow-sm'
                           : isUnread
-                          ? 'bg-[#1e343f] border-l-4 border-l-[#25d366] ring-1 ring-[#25d366]/40 shadow-lg hover:bg-[#253e4c]'
-                          : 'bg-[#111b21] hover:bg-[#202c33]/60'
+                          ? 'bg-[#182a32] border-[#00a884]/40 hover:bg-[#1e343f]'
+                          : 'bg-[#111b21] border-transparent hover:bg-[#202c33]/70'
                       }`}
                     >
                     <div
@@ -433,9 +433,9 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                         <div
                           className={`h-11 w-11 overflow-hidden rounded-full border ${
                             isCounselorChat
-                              ? 'border-teal-400 bg-teal-100 text-teal-800'
-                              : 'border-slate-200 bg-sky-100 text-sky-700'
-                          } flex items-center justify-center font-bold text-sm shadow-2xs`}
+                              ? 'border-[#00a884]/60 bg-teal-950 text-teal-300'
+                              : 'border-[#222d34] bg-[#202c33] text-slate-200'
+                          } flex items-center justify-center font-bold text-sm shadow-xs`}
                         >
                           {other.photoURL ? (
                             <img
@@ -448,8 +448,8 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                           )}
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
-                            other.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                          className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#111b21] ${
+                            other.isOnline ? 'bg-[#00a884]' : 'bg-slate-500'
                           }`}
                           title={other.isOnline ? 'অনলাইন' : 'অফলাইন'}
                         />
@@ -459,7 +459,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                            <h3 className={`text-xs sm:text-sm font-black break-words leading-tight ${unread > 0 ? 'text-white' : 'text-slate-100'}`}>
+                            <h3 className={`text-xs sm:text-sm font-bold truncate leading-tight ${unread > 0 ? 'text-white' : 'text-slate-100'}`}>
                               {other.name}
                             </h3>
                             {isNewStudent(other.createdAt) && !isCounselorChat && (
@@ -468,18 +468,18 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                               </span>
                             )}
                             {isCounselorChat && (
-                              <span className="inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 px-1.5 py-0.2 text-[9px] font-bold text-[#00a884] shrink-0">
+                              <span className="inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#00a884] shrink-0">
                                 <ShieldCheck className="h-2.5 w-2.5" />
-                                <span>কাউন্সিলর আইডি</span>
+                                <span>কাউন্সিলর</span>
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1 shrink-0">
+                          <div className="flex items-center gap-1 shrink-0 ml-1">
                             {isCounselorChat && (
                               <Pin className="h-3 w-3 text-[#00a884] fill-[#00a884] transform -rotate-45" title="পিন করা আইডি" />
                             )}
-                            <span className={`text-[10px] ${unread > 0 ? 'text-[#25d366] font-black' : 'text-slate-400 font-medium'}`}>
+                            <span className={`text-[10px] font-mono tabular-nums ${unread > 0 ? 'text-[#00a884] font-bold' : 'text-slate-400 font-normal'}`}>
                               {formatMessageTime(conv.updatedAt)}
                             </span>
                           </div>
@@ -487,60 +487,50 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
 
                         {/* Phone display for Counselor clarity */}
                         {other.phone && (
-                          <div className="text-[10px] text-slate-300 font-mono font-medium leading-tight mt-0.5">
-                            মোবাইল: {other.phone}
+                          <div className="text-[10px] text-slate-400 font-mono font-medium leading-tight mt-0.5 tabular-nums">
+                            {other.phone}
                           </div>
                         )}
 
                         <div className="mt-1 flex items-center justify-between">
                           <div
-                            className={`flex items-center gap-1.5 truncate max-w-[170px] sm:max-w-[210px] ${
+                            className={`flex items-center gap-1.5 truncate max-w-[170px] sm:max-w-[220px] ${
                               unread > 0
-                                ? 'text-[#25d366] font-black text-[12px] bg-[#25d366]/10 px-2 py-0.5 rounded-md border border-[#25d366]/30 shadow-2xs'
-                                : 'text-slate-400 font-medium text-[11px]'
+                                ? 'text-[#00a884] font-bold text-xs'
+                                : 'text-slate-400 font-normal text-xs'
                             }`}
                           >
-                            {unread > 0 && (
-                              <span className="flex h-2 w-2 shrink-0 rounded-full bg-[#25d366] animate-ping" />
-                            )}
                             {conv.lastMessageType === 'audio' ? (
                               <>
-                                <Mic className={`h-3 w-3 shrink-0 ${unread > 0 ? 'text-[#25d366]' : 'text-teal-400'}`} />
+                                <Mic className={`h-3.5 w-3.5 shrink-0 ${unread > 0 ? 'text-[#00a884]' : 'text-teal-400'}`} />
                                 <span>ভয়েস মেসেজ</span>
                               </>
                             ) : conv.lastMessageType === 'image' ? (
                               <>
-                                <ImageIcon className={`h-3 w-3 shrink-0 ${unread > 0 ? 'text-[#25d366]' : 'text-sky-400'}`} />
+                                <ImageIcon className={`h-3.5 w-3.5 shrink-0 ${unread > 0 ? 'text-[#00a884]' : 'text-sky-400'}`} />
                                 <span>ছবি</span>
                               </>
                             ) : (
                               <span className="truncate">
-                                {conv.lastMessage || 'চ্যাট শুরু করতে ট্যাপ করুন'}
+                                {conv.lastMessage || 'কথোপকথন শুরু করতে ট্যাপ করুন'}
                               </span>
                             )}
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
-                            {isCounselorChat && (
-                              <span className="inline-flex items-center gap-1 rounded-lg bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs group-hover:bg-teal-700 transition">
-                                <MessageSquare className="h-3 w-3" />
-                                <span>মেসেজ দিন</span>
-                              </span>
-                            )}
                             {isCounselor ? (
                               unread > 0 ? (
-                                <span className="flex items-center gap-1 rounded-full bg-[#25d366] px-2 py-0.5 text-[10px] font-black text-slate-950 shadow-sm border border-emerald-300 animate-pulse">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-slate-950 animate-ping inline-block" />
-                                  <span>নতুন মেসেজ</span>
+                                <span className="flex items-center gap-1 rounded-full bg-[#00a884] px-2 py-0.5 text-[10px] font-bold text-slate-950 shadow-xs tabular-nums">
+                                  <span>{unread}</span>
                                 </span>
                               ) : isReadByCounselor ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-teal-400 font-bold bg-[#182229] px-2 py-0.5 rounded-full border border-teal-700/60 shadow-2xs">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-teal-400 font-semibold bg-[#182229] px-2 py-0.5 rounded-full border border-teal-700/40">
                                   <CheckCheck className="h-3 w-3 text-teal-400" />
-                                  <span>রিড হয়েছে</span>
+                                  <span>পড়া হয়েছে</span>
                                 </span>
                               ) : null
                             ) : unread > 0 ? (
-                              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#25d366] px-1.5 text-[10px] font-black text-slate-950">
+                              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#00a884] px-1.5 text-[10px] font-extrabold text-slate-950 tabular-nums">
                                 {unread}
                               </span>
                             ) : null}
@@ -557,12 +547,12 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                                   e.stopPropagation();
                                   setSelectedLabelFilter(selectedLabelFilter === lbl ? 'all' : lbl);
                                 }}
-                                className={`rounded-md px-1.5 py-0.2 text-[9px] font-bold transition cursor-pointer ${
+                                className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold transition cursor-pointer ${
                                   lbl === 'নিউ মেম্বার'
-                                    ? 'bg-amber-100 border border-amber-300 text-amber-800 animate-pulse'
-                                    : 'bg-emerald-50 border border-emerald-200/80 text-emerald-800 hover:bg-emerald-100'
+                                    ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+                                    : 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25'
                                 }`}
-                                title={`"${lbl}" লেবেল অনুসারে ফিল্টার করতে ট্যাপ করুন`}
+                                title={`"${lbl}" লেবেল ফিল্টার`}
                               >
                                 {lbl}
                               </span>
@@ -573,7 +563,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                     </div>
 
                     {/* Actions: Set Labels & Delete */}
-                    <div className="flex items-center gap-1.5 ml-2 transition shrink-0">
+                    <div className="flex items-center gap-1 ml-2 transition shrink-0">
                       {isCounselor && (
                         <>
                           <button
@@ -582,18 +572,14 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                               e.stopPropagation();
                               setLabelModalConv(conv);
                             }}
-                            className={`rounded-xl p-1.5 transition cursor-pointer border ${
+                            className={`rounded-lg p-1.5 transition cursor-pointer border ${
                               conv.labels && conv.labels.length > 0
-                                ? 'text-emerald-600 bg-emerald-50 fill-emerald-600 hover:bg-emerald-100 border-emerald-300 shadow-2xs'
-                                : 'text-slate-400 hover:text-teal-600 hover:bg-teal-50 border-slate-200/60 bg-white'
+                                ? 'text-[#00a884] bg-[#00a884]/15 border-[#00a884]/40 hover:bg-[#00a884]/25'
+                                : 'text-slate-400 hover:text-teal-400 hover:bg-[#202c33] border-[#222d34] bg-[#111b21]'
                             }`}
-                            title={
-                              conv.labels && conv.labels.length > 0
-                                ? `লেবেল সংযুক্ত আছে (${conv.labels.join(', ')}) - পরিবর্তন করতে ট্যাপ করুন`
-                                : 'লেবেল সেট করুন'
-                            }
+                            title="লেবেল সেট করুন"
                           >
-                            <Tag className={`h-3.5 w-3.5 ${conv.labels && conv.labels.length > 0 ? 'fill-emerald-600 text-emerald-600' : ''}`} />
+                            <Tag className={`h-3.5 w-3.5 ${conv.labels && conv.labels.length > 0 ? 'fill-[#00a884]' : ''}`} />
                           </button>
 
                           <button
@@ -602,7 +588,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                               e.stopPropagation();
                               setDeletingConv(conv);
                             }}
-                            className="rounded-xl p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200/60 bg-white transition cursor-pointer"
+                            className="rounded-lg p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 border border-[#222d34] bg-[#111b21] transition cursor-pointer"
                             title="চ্যাটটি ডিলিট করুন"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -637,15 +623,15 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
 
       {/* Delete / Block Confirmation Modal */}
       {deletingConv && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 mb-4 shadow-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-[#111b21] p-6 shadow-2xl border border-[#222d34] animate-in zoom-in-95 text-slate-100">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 border border-red-500/30 text-rose-400 mb-4 shadow-sm">
               <Trash2 className="h-7 w-7" />
             </div>
-            <h3 className="text-center text-base font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-center text-base font-bold text-white tracking-tight">
               চ্যাট অপশন
             </h3>
-            <p className="mt-1.5 text-center text-[11px] font-medium text-slate-500 leading-relaxed max-w-[260px] mx-auto">
+            <p className="mt-1.5 text-center text-xs text-slate-400 leading-relaxed max-w-[260px] mx-auto">
               আপনি কি এই চ্যাটটি ডিলিট করতে চান নাকি ইউজারকে ব্লক করতে চান?
             </p>
 
@@ -654,7 +640,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                 type="button"
                 disabled={deleteLoading}
                 onClick={handleBlockChat}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-amber-500 py-3 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-50 transition cursor-pointer shadow-sm"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 hover:bg-amber-400 disabled:opacity-50 transition cursor-pointer shadow-sm"
               >
                 <ShieldCheck className="h-4 w-4" />
                 {deleteLoading ? 'প্রসেসিং...' : 'ইউজারকে ব্লক করুন'}
@@ -664,7 +650,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                 type="button"
                 disabled={deleteLoading}
                 onClick={confirmDeleteChat}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-rose-600 py-3 text-sm font-bold text-white hover:bg-rose-700 disabled:opacity-50 transition cursor-pointer shadow-sm"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-rose-600 py-3 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-50 transition cursor-pointer shadow-sm"
               >
                 <Trash2 className="h-4 w-4" />
                 {deleteLoading ? 'ডিলিট হচ্ছে...' : 'চ্যাটটি ডিলিট করুন'}
@@ -673,7 +659,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => setDeletingConv(null)}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                className="w-full rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 text-xs font-semibold text-slate-300 hover:bg-[#2a3942] transition cursor-pointer"
               >
                 বাতিল করুন
               </button>
@@ -684,16 +670,16 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
 
       {/* Delete All Chats Modal */}
       {showDeleteAllModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl border border-slate-100 animate-in zoom-in-95">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 mb-4 shadow-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-[#111b21] p-6 shadow-2xl border border-[#222d34] animate-in zoom-in-95 text-slate-100">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 border border-red-500/30 text-rose-400 mb-4 shadow-sm">
               <Trash2 className="h-7 w-7" />
             </div>
-            <h3 className="text-center text-base font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-center text-base font-bold text-white tracking-tight">
               সকল চ্যাট ডিলিট?
             </h3>
-            <p className="mt-1.5 text-center text-[11px] font-medium text-slate-500 leading-relaxed max-w-[260px] mx-auto">
-              আপনার সমস্ত চ্যাট হিস্ট্রি ডিলিট হয়ে যাবে যা আর উদ্ধার করা সম্ভব নয়।
+            <p className="mt-1.5 text-center text-xs text-slate-400 leading-relaxed max-w-[260px] mx-auto">
+              আপনার সমস্ত চ্যাট হিস্ট্রি স্থায়ীভাবে ডিলিট হয়ে যাবে যা আর পুনরুদ্ধার সম্ভব নয়।
             </p>
 
             <div className="mt-5 space-y-2.5">
@@ -701,7 +687,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
                 type="button"
                 disabled={deleteLoading}
                 onClick={confirmDeleteAllChats}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-rose-600 py-3 text-sm font-bold text-white hover:bg-rose-700 disabled:opacity-50 transition cursor-pointer shadow-sm"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-rose-600 py-3 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-50 transition cursor-pointer shadow-sm"
               >
                 <Trash2 className="h-4 w-4" />
                 {deleteLoading ? 'ডিলিট হচ্ছে...' : 'হ্যাঁ, সব ডিলিট করুন'}
@@ -710,7 +696,7 @@ export const ChatList: React.FC<ChatListProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => setShowDeleteAllModal(false)}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                className="w-full rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 text-xs font-semibold text-slate-300 hover:bg-[#2a3942] transition cursor-pointer"
               >
                 বাতিল করুন
               </button>

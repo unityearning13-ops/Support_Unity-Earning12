@@ -34,6 +34,7 @@ import {
   Globe,
   ShieldAlert,
   ShieldCheck,
+  Unlock,
 } from 'lucide-react';
 import {
   collection,
@@ -54,7 +55,7 @@ import { generateCounselorLink, COUNSELOR_UID } from '../utils/counselor';
 import { AdminPushNotificationManager } from './AdminPushNotificationManager';
 import { TopNotificationBanner } from './TopNotificationBanner';
 import { getYouTubeEmbedUrl } from '../utils/youtube';
-import { blockUserAndDevice, unblockUserAndDevice } from '../utils/security';
+import { blockUserAndDevice, unblockUserAndDevice, unblockAllUsersAndEntities } from '../utils/security';
 
 interface AdminDashboardProps {
   currentUser: UserProfile | null;
@@ -121,6 +122,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [youtubeVideoUrl, setYoutubeVideoUrl] = useState('');
   const [companyLogoUrl, setCompanyLogoUrl] = useState(initialLogoUrl);
   const [blockMultipleAccountsPerDevice, setBlockMultipleAccountsPerDevice] = useState(true);
+  const [unblockAllUsers, setUnblockAllUsers] = useState(false);
+  const [unblockAllToggling, setUnblockAllToggling] = useState(false);
+  const [unblockAllDbLoading, setUnblockAllDbLoading] = useState(false);
+  const [showUnblockAllConfirm, setShowUnblockAllConfirm] = useState(false);
   const [savingLinks, setSavingLinks] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoUploadProgress, setLogoUploadProgress] = useState(0);
@@ -178,6 +183,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.blockMultipleAccountsPerDevice !== undefined) {
             setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
           }
+          if (cfg.unblockAllUsers !== undefined) {
+            setUnblockAllUsers(Boolean(cfg.unblockAllUsers));
+          }
         }
       } catch {}
     } catch (err) {
@@ -205,6 +213,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           if (cfg.companyLogoUrl !== undefined) setCompanyLogoUrl(cfg.companyLogoUrl);
           if (cfg.blockMultipleAccountsPerDevice !== undefined) {
             setBlockMultipleAccountsPerDevice(Boolean(cfg.blockMultipleAccountsPerDevice));
+          }
+          if (cfg.unblockAllUsers !== undefined) {
+            setUnblockAllUsers(Boolean(cfg.unblockAllUsers));
           }
         }
       },
@@ -404,6 +415,78 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setActionError('স্ট্যাটাস পরিবর্তন করা সম্ভব হয়নি।');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  // Toggle Global Unblock All Mode
+  const handleToggleUnblockAllMode = async (newVal: boolean) => {
+    setUnblockAllToggling(true);
+    try {
+      await setDoc(
+        doc(db, 'settings', 'systemConfig'),
+        {
+          unblockAllUsers: newVal,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+      setUnblockAllUsers(newVal);
+      if (newVal) {
+        setActionSuccess(
+          'আনব্লক অল ইউজার্স মোড চালু করা হয়েছে! এখন সকল ইউজার ও রেফারাল লিংকের ভিজিটর কোনো বাধা ছাড়া অ্যাপ ব্যবহার করতে পারবে।'
+        );
+      } else {
+        setActionSuccess(
+          'ব্লক সিকিউরিটি পুনরায় সক্রিয় করা হয়েছে। যাদের পূর্বে বা বর্তমানে ব্লক করা হয়েছে তারা অ্যাপ ব্যবহার করতে পারবে না।'
+        );
+      }
+      setTimeout(() => setActionSuccess(''), 5000);
+    } catch (err) {
+      console.error('Toggle unblock all error:', err);
+      setActionError('সেটিংস পরিবর্তন করতে ব্যর্থ হয়েছে।');
+      setTimeout(() => setActionError(''), 4000);
+    } finally {
+      setUnblockAllToggling(false);
+    }
+  };
+
+  // Wipe all blocks in database
+  const handleWipeAllBlocksInDatabase = async () => {
+    setUnblockAllDbLoading(true);
+    try {
+      const result = await unblockAllUsersAndEntities('চিফ এডমিন');
+
+      // Update local states
+      setUsersList((prev) =>
+        prev.map((u) => ({
+          ...u,
+          isBlocked: false,
+          blockedReason: undefined,
+          blockedAt: undefined,
+          blockedBy: undefined,
+        }))
+      );
+      setCounselorsList((prev) =>
+        prev.map((c) => ({
+          ...c,
+          isBlocked: false,
+          blockedReason: undefined,
+          blockedAt: undefined,
+          blockedBy: undefined,
+        }))
+      );
+
+      setShowUnblockAllConfirm(false);
+      setActionSuccess(
+        `সফলভাবে ${result.unblockedUsersCount} জন ইউজার এবং ${result.clearedEntitiesCount}টি ডিভাইস/আইপি রেকর্ড ডাটাবেজ থেকে সম্পূর্ণ আনব্লক করা হয়েছে!`
+      );
+      setTimeout(() => setActionSuccess(''), 6000);
+    } catch (err) {
+      console.error('Error wiping blocks:', err);
+      setActionError('সকলকে আনব্লক করার সময় সমস্যা হয়েছে।');
+      setTimeout(() => setActionError(''), 4000);
+    } finally {
+      setUnblockAllDbLoading(false);
     }
   };
 
@@ -1445,8 +1528,102 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* ========================================================= */}
         {activeTab === 'blocked' && (
           <div className="space-y-4">
+            {/* MASTER UNBLOCK ALL USERS CONTROL CARD */}
+            <div
+              className={`rounded-2xl border transition-all p-4 sm:p-5 shadow-lg space-y-4 ${
+                unblockAllUsers
+                  ? 'border-emerald-500/50 bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 ring-1 ring-emerald-500/30'
+                  : 'border-slate-800 bg-slate-950'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div
+                    className={`p-3 rounded-2xl shrink-0 transition-colors ${
+                      unblockAllUsers
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-md shadow-emerald-500/10'
+                        : 'bg-red-500/15 text-red-400 border border-red-500/20'
+                    }`}
+                  >
+                    {unblockAllUsers ? <Unlock className="h-6 w-6" /> : <ShieldAlert className="h-6 w-6" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-1.5">
+                        <span>আনব্লক অল ইউজার্স (Unblock All Users)</span>
+                      </h3>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide ${
+                          unblockAllUsers
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                        }`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            unblockAllUsers ? 'bg-emerald-400 animate-ping' : 'bg-red-400'
+                          }`}
+                        />
+                        {unblockAllUsers
+                          ? 'আনব্লক মোড সক্রিয় (সবাই ব্যবহার করতে পারছে)'
+                          : 'ব্লক সিস্টেম কার্যকর'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      {unblockAllUsers
+                        ? '🟢 এই অপশনটি অন (ON) থাকায় সিস্টেমের সব ব্লক সাময়িকভাবে স্থগিত রয়েছে — যাদের পূর্বে ব্লক করা হয়েছিল তারা সহ সবাই রেফারাল লিংক ও অ্যাপ ব্যবহার করতে পারছে।'
+                        : '🔴 এই অপশনটি অফ (OFF) থাকায় স্বাভাবিক ব্লক সিকিউরিটি কার্যকর রয়েছে — যাদের ব্লক করা হয়েছে তারা কোনো রেফারাল লিংক বা অ্যাপে ঢুকতে পারবে না।'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Master Switch */}
+                <div className="flex items-center gap-3 self-end sm:self-center shrink-0 bg-slate-900/90 px-3.5 py-2 rounded-xl border border-slate-800">
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-white">
+                      {unblockAllUsers ? 'আনব্লক অল: ON' : 'আনব্লক অল: OFF'}
+                    </div>
+                    <div className="text-[10px] text-slate-400">
+                      {unblockAllUsers ? 'সবাইকে এক্সেস দেওয়া হয়েছে' : 'ব্লক করা ইউজাররা ব্লকড'}
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={unblockAllUsers}
+                      disabled={unblockAllToggling}
+                      onChange={(e) => handleToggleUnblockAllMode(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-12 h-6.5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 border border-slate-700"></div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Buttons Row */}
+              <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <span>
+                    ডাটাবেজের সকল ব্লকড ইউজার ও ডিভাইসের তথ্য স্থায়ীভাবে মুছে ফেলতে নিচের বাটনটি চাপুন:
+                  </span>
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => setShowUnblockAllConfirm(true)}
+                  disabled={unblockAllDbLoading}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-xs font-bold transition shadow-md shadow-emerald-900/40 cursor-pointer disabled:opacity-50"
+                  title="ডাটাবেজ থেকে সমস্ত ব্লকড ইউজার ও ডিভাইসের তথ্য মুছে সবাইকে স্বাভাবিক করুন"
+                >
+                  <UserCheck className="h-4 w-4" />
+                  <span>সকলকে ডাটাবেজে আনব্লক করুন (Unblock All Users)</span>
+                </button>
+              </div>
+            </div>
+
             {/* Header / Search Controls */}
-            <div className="rounded-2xl border border-red-500/20 bg-slate-950 p-4 shadow-md space-y-3">
+            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 shadow-md space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -1454,7 +1631,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <span>ব্লক ইউজার তালিকা ও ডিভাইস সিকিউরিটি</span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    এই ইউজারদের একাউন্ট, ডিভাইস আইডি এবং আইপি অ্যাড্রেস সম্পূর্ণ ব্লক রয়েছে। তারা কোনো রেফারাল লিংক দিয়েও ঢুকতে পারবে না।
+                    এই ইউজারদের একাউন্ট, ডিভাইস আইডি এবং আইপি অ্যাড্রেস ব্লকলিস্টে রয়েছে।
                   </p>
                 </div>
 
@@ -2248,6 +2425,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 className="flex-1 rounded-xl bg-red-600 py-2.5 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50"
               >
                 {bulkDeleting ? 'ডিলিট হচ্ছে...' : 'সিলেক্টেড ডিলিট'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* UNBLOCK ALL DATABASE CONFIRMATION MODAL */}
+      {showUnblockAllConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-3xl border border-emerald-500/40 bg-slate-950 p-6 text-left shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 text-emerald-400">
+              <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shrink-0">
+                <UserCheck className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">সকল ইউজারকে ডাটাবেজে আনব্লক করবেন?</h3>
+                <p className="text-xs text-slate-400">ডিভাইস ও আইপি ব্লক তালিকা সম্পূর্ণ পরিষ্কার</p>
+              </div>
+            </div>
+
+            <p className="text-xs leading-relaxed text-slate-300 bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+              এই অপশনে নিশ্চিত করলে পূর্বে ব্লক করা সকল ইউজার একাউন্ট, ডিভাইস আইডি এবং আইপি অ্যাড্রেস ব্লকলিস্ট থেকে চিরতরে মুছে যাবে। ফলে প্রত্যেকে মুক্তভাবে রেফারাল লিংক ও অ্যাপ ব্যবহার করতে পারবে।
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={unblockAllDbLoading}
+                onClick={() => setShowUnblockAllConfirm(false)}
+                className="flex-1 rounded-xl bg-slate-800 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition cursor-pointer"
+              >
+                বাতিল
+              </button>
+              <button
+                type="button"
+                disabled={unblockAllDbLoading}
+                onClick={handleWipeAllBlocksInDatabase}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 py-2.5 text-xs font-bold text-white transition cursor-pointer shadow-lg shadow-emerald-600/30 disabled:opacity-50"
+              >
+                {unblockAllDbLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>আনব্লক হচ্ছে...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>হ্যাঁ, সবাইকে আনব্লক করুন</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

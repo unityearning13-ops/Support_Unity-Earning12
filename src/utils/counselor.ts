@@ -18,12 +18,12 @@ export const COUNSELOR_PROFILE: UserProfile = {
   createdAt: '2026-01-01T00:00:00.000Z',
 };
 
-// Generate shareable link for a counselor
+import { getWebsiteBaseUrl } from './android';
+
+// Generate shareable link for a counselor (ALWAYS a clean web URL that opens in browser)
 export const generateCounselorLink = (counselorUid: string): string => {
-  const origin = typeof window !== 'undefined' && window.location?.origin
-    ? window.location.origin
-    : '';
-  return `${origin}/ref/${encodeURIComponent(counselorUid)}`;
+  const base = getWebsiteBaseUrl();
+  return `${base}/ref/${encodeURIComponent(counselorUid)}`;
 };
 
 // Ensure official counselor exists in database

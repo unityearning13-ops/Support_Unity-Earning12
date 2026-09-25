@@ -36,10 +36,12 @@ import {
   Edit2 as EditIcon,
   Key as KeyIcon,
   Bell as BellIcon,
+  Unlock as UnlockIcon,
 } from 'lucide-react';
 import { compressImage } from '../utils/media';
 import { generateCounselorLink, COUNSELOR_UID, COUNSELOR_PROFILE } from '../utils/counselor';
 import { AdminPushNotificationManager } from './AdminPushNotificationManager';
+import { unblockAllUsersAndEntities, setGlobalUnblockMode } from '../utils/security';
 
 interface AdminModalProps {
   currentUid: string;
@@ -67,6 +69,9 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [facebookPageUrl, setFacebookPageUrl] = useState('https://www.facebook.com/unityearning');
   const [supportEmail, setSupportEmail] = useState('unityearning13@gmail.com');
   const [savingLinks, setSavingLinks] = useState(false);
+  const [unblockAllUsers, setUnblockAllUsers] = useState(false);
+  const [unblockAllLoading, setUnblockAllLoading] = useState(false);
+  const [unblockDbLoading, setUnblockDbLoading] = useState(false);
 
   // Dashboard state
   const [loadingData, setLoadingData] = useState(false);
@@ -185,6 +190,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           if (cfg.telegramUrl) setTelegramUrl(cfg.telegramUrl);
           if (cfg.facebookPageUrl) setFacebookPageUrl(cfg.facebookPageUrl);
           if (cfg.supportEmail) setSupportEmail(cfg.supportEmail);
+          if (cfg.unblockAllUsers !== undefined) setUnblockAllUsers(Boolean(cfg.unblockAllUsers));
         }
       } catch (err) {
         console.warn('System config load notice:', err);
@@ -436,6 +442,39 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       console.error('Failed to toggle block:', err);
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleToggleUnblockAll = async (enabled: boolean) => {
+    setUnblockAllLoading(true);
+    try {
+      await setGlobalUnblockMode(enabled);
+      setUnblockAllUsers(enabled);
+      setActionSuccess(
+        enabled
+          ? 'আনব্লক অল মোড চালু করা হয়েছে! সবাই কোনো বাধা ছাড়া রেফারাল লিংক ও অ্যাপ ব্যবহার করতে পারবে।'
+          : 'ব্লক সিকিউরিটি পুনরায় সক্রিয় করা হয়েছে। যাদের ব্লক করা হয়েছে তারা অ্যাপ ব্যবহার করতে পারবে না।'
+      );
+      setTimeout(() => setActionSuccess(''), 4000);
+    } catch (err) {
+      console.error('Error toggling unblock all:', err);
+    } finally {
+      setUnblockAllLoading(false);
+    }
+  };
+
+  const handleDbUnblockAll = async () => {
+    setUnblockDbLoading(true);
+    try {
+      const res = await unblockAllUsersAndEntities('চিফ এডমিন');
+      setUsersList((prev) => prev.map((u) => ({ ...u, isBlocked: false })));
+      setStats((prev) => ({ ...prev, blockedUsers: 0 }));
+      setActionSuccess(`সফলভাবে ${res.unblockedUsersCount} জন ইউজার ডাটাবেজ থেকে আনব্লক হয়েছে!`);
+      setTimeout(() => setActionSuccess(''), 4000);
+    } catch (err) {
+      console.error('Error in handleDbUnblockAll:', err);
+    } finally {
+      setUnblockDbLoading(false);
     }
   };
 
@@ -972,7 +1011,68 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
               {/* TAB 2: USERS MANAGEMENT */}
               {activeTab === 'users' && (
-                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 space-y-3">
+                <div className="space-y-3">
+                  {/* UNBLOCK ALL USERS CONTROL BANNER */}
+                  <div className={`rounded-2xl border p-3.5 space-y-2.5 transition-all shadow-xs ${
+                    unblockAllUsers
+                      ? 'border-emerald-500/50 bg-emerald-50/50'
+                      : 'border-slate-200 bg-slate-50'
+                  }`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className={`p-2 rounded-xl ${
+                          unblockAllUsers ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+                        }`}>
+                          <UnlockIcon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-900">
+                              আনব্লক অল ইউজার্স (Unblock All Users)
+                            </span>
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              unblockAllUsers
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-slate-200 text-slate-600'
+                            }`}>
+                              {unblockAllUsers ? 'অন (সবাই ব্যবহার করতে পারছে)' : 'অফ (ব্লক চালু)'}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500">
+                            {unblockAllUsers
+                              ? 'সকল ইউজার আনব্লক রয়েছে, রেফারাল লিংক দিয়ে সবাই প্রবেশ করতে পারছে।'
+                              : 'সাধারণ ব্লক পলিসি চালু রয়েছে, ব্লক করা ইউজাররা ঢুকতে পারবে না।'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={unblockAllUsers}
+                            disabled={unblockAllLoading}
+                            onChange={(e) => handleToggleUnblockAll(e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-10 h-5.5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={handleDbUnblockAll}
+                          disabled={unblockDbLoading}
+                          className="flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 text-xs font-bold transition cursor-pointer disabled:opacity-50"
+                          title="ডাটাবেজ থেকে সবাইকে সম্পূর্ণ আনব্লক করুন"
+                        >
+                          <UserCheckIcon className="h-3.5 w-3.5" />
+                          <span>ডাটাবেজে আনব্লক করুন</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-3.5 space-y-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-slate-100">
                     <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
                       <UsersIcon className="h-4 w-4 text-sky-600" />
@@ -1113,7 +1213,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     )}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               {/* TAB 3: COMMUNITY & SOCIAL LINKS */}
               {activeTab === 'links' && (
@@ -1229,7 +1330,19 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       <span className="text-[11px] font-medium">স্থগিত একাউন্ট</span>
                       <UserXIcon className="h-4 w-4 text-red-600" />
                     </div>
-                    <div className="mt-1 text-lg font-bold text-red-600">{stats.blockedUsers}</div>
+                    <div className="mt-1 flex items-center justify-between">
+                      <div className="text-lg font-bold text-red-600">{stats.blockedUsers}</div>
+                      {stats.blockedUsers > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleDbUnblockAll}
+                          disabled={unblockDbLoading}
+                          className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 transition cursor-pointer"
+                        >
+                          সব আনব্লক
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

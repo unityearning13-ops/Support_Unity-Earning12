@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#primaryGrad)" />
+  <!-- Chat Bubble Background -->
+  <path d="M120 160C120 126.863 146.863 100 180 100H332C365.137 100 392 126.863 392 160V280C392 313.137 365.137 340 332 340H210L140 395V340H180C146.863 340 120 313.137 120 280V160Z" fill="#ffffff" />
+  <!-- Live Signal Wave / Unity Earning Accent -->
+  <circle cx="210" cy="220" r="18" fill="#0284c7" />
+  <circle cx="260" cy="220" r="18" fill="#0d9488" />
+  <circle cx="310" cy="220" r="18" fill="#16a34a" />
+</svg>

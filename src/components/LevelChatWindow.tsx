@@ -297,38 +297,37 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
       onBack();
     } catch (err) {
       console.error('Error deleting level chat:', err);
-      alert('লেভেল চ্যাট ডিলিট করা যায়নি।');
     }
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-slate-50 overflow-hidden">
+    <div className="flex h-full w-full flex-col bg-[#0b141a] overflow-hidden select-none">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 sm:px-4 py-2.5 shadow-2xs z-10">
+      <div className="flex items-center justify-between border-b border-[#222d34] bg-[#111b21] px-3 sm:px-4 py-2.5 shadow-sm z-10 text-white">
         <div className="flex items-center gap-2.5 min-w-0">
           <button
             onClick={onBack}
-            className="rounded-xl p-1.5 text-slate-500 hover:bg-slate-100 transition cursor-pointer md:hidden"
+            className="rounded-xl p-1.5 text-slate-400 hover:bg-[#202c33] hover:text-white transition cursor-pointer md:hidden"
             title="ফিরে যান"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
 
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-600 text-white shadow-xs font-bold text-xs">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#00a884] text-slate-950 font-bold shadow-xs">
             <Layers className="h-5 w-5" />
           </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h3 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+              <h3 className="text-xs sm:text-sm font-bold text-white truncate">
                 {levelChat.name}
               </h3>
-              <span className="shrink-0 rounded-full bg-teal-100 px-2 py-0.2 text-[10px] font-bold text-teal-800">
+              <span className="shrink-0 rounded-full bg-[#00a884]/20 border border-[#00a884]/30 px-2 py-0.2 text-[10px] font-bold text-[#00a884]">
                 {levelChat.levelNumber}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 truncate flex items-center gap-1">
-              <GraduationCap className="h-3 w-3 text-teal-600 shrink-0" />
+            <p className="text-[11px] text-slate-400 truncate flex items-center gap-1 font-medium">
+              <GraduationCap className="h-3 w-3 text-[#00a884] shrink-0" />
               <span>কাউন্সিলর: {levelChat.createdByCounselorName}</span>
             </p>
           </div>
@@ -348,7 +347,7 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(false)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                    className="rounded-lg border border-[#222d34] bg-[#202c33] px-2 py-1 text-[11px] font-semibold text-slate-300 hover:bg-[#2a3942] transition cursor-pointer"
                   >
                     না
                   </button>
@@ -356,7 +355,7 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
               ) : (
                 <button
                   onClick={() => setDeleteConfirm(true)}
-                  className="rounded-xl p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 transition cursor-pointer"
+                  className="rounded-xl p-2 text-slate-400 hover:bg-rose-950/40 hover:text-rose-400 transition cursor-pointer"
                   title="লেভেল চ্যাট মুছে ফেলুন"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -369,24 +368,24 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
 
       {/* Level Description Banner */}
       {levelChat.description && (
-        <div className="border-b border-teal-100 bg-teal-50/60 px-4 py-2 flex items-center gap-2 text-[11px] text-teal-900 font-medium">
-          <Sparkles className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+        <div className="border-b border-teal-950 bg-teal-950/40 px-4 py-2 flex items-center gap-2 text-[11px] text-teal-300 font-medium">
+          <Sparkles className="h-3.5 w-3.5 text-[#00a884] shrink-0" />
           <span className="truncate">{levelChat.description}</span>
         </div>
       )}
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#0b141a]">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-teal-100/70 text-teal-600 mb-2">
+            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-[#202c33] text-[#00a884] mb-3 border border-[#222d34]">
               <Layers className="h-7 w-7" />
             </div>
-            <h4 className="text-sm font-bold text-slate-800">
+            <h4 className="text-sm font-bold text-white">
               {levelChat.name}-এ স্বাগতম!
             </h4>
-            <p className="mt-1 max-w-xs text-xs text-slate-500">
-              কাউন্সিলর ও শিক্ষার্থীদের লাইভ চ্যাট ফোরাম। নিচে আপনার প্রশ্ন বা মেসেজ লিখুন।
+            <p className="mt-1 max-w-xs text-xs text-slate-400 leading-relaxed">
+              কাউন্সিলর ও শিক্ষার্থীদের লাইভ ফোরাম। নিচে আপনার প্রশ্ন বা মেসেজ লিখুন।
             </p>
           </div>
         ) : (
@@ -399,14 +398,14 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
                 key={msg.id}
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
               >
-                {/* Sender Name & Badge (shown for non-me or counselors) */}
+                {/* Sender Name & Badge */}
                 {!isMe && (
                   <div className="flex items-center gap-1.5 mb-1 px-1">
-                    <span className="text-[11px] font-bold text-slate-700">
+                    <span className="text-[11px] font-bold text-slate-300">
                       {msg.senderName}
                     </span>
                     {isCounselorMsg && (
-                      <span className="inline-flex items-center gap-0.5 rounded-full bg-teal-100 px-1.5 py-0.2 text-[9px] font-bold text-teal-800">
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#00a884]/20 border border-[#00a884]/30 px-1.5 py-0.2 text-[9px] font-bold text-teal-300">
                         <GraduationCap className="h-2.5 w-2.5" />
                         <span>কাউন্সিলর</span>
                       </span>
@@ -416,12 +415,12 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
 
                 {/* Message Bubble */}
                 <div
-                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-3 shadow-2xs ${
+                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-3 shadow-2xs text-xs sm:text-sm ${
                     isMe
-                      ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-br-xs'
+                      ? 'bg-[#005c4b] text-white rounded-br-xs'
                       : isCounselorMsg
-                      ? 'bg-teal-50/90 text-slate-900 border border-teal-200 rounded-bl-xs'
-                      : 'bg-white text-slate-900 border border-slate-200/80 rounded-bl-xs'
+                      ? 'bg-[#182a32] text-slate-100 border border-teal-700/50 rounded-bl-xs'
+                      : 'bg-[#202c33] text-slate-100 border border-[#222d34] rounded-bl-xs'
                   }`}
                 >
                   {/* Image Message */}
@@ -430,20 +429,21 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
                       <img
                         src={msg.mediaUrl}
                         alt="Shared media"
-                        className="max-h-60 w-full object-cover rounded-xl"
+                        className="max-h-60 w-full object-cover rounded-xl cursor-pointer hover:opacity-95 transition"
+                        onClick={() => window.open(msg.mediaUrl, '_blank')}
                       />
                     </div>
                   )}
 
                   {/* Audio Message */}
                   {msg.type === 'audio' && msg.mediaUrl && (
-                    <div className="flex items-center gap-2 py-1">
+                    <div className="flex items-center gap-2 py-1 min-w-[180px]">
                       <button
                         onClick={() => handlePlayAudio(msg.id, msg.mediaUrl)}
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition cursor-pointer ${
                           isMe
-                            ? 'bg-white text-teal-700'
-                            : 'bg-teal-600 text-white hover:bg-teal-700'
+                            ? 'bg-white text-teal-800'
+                            : 'bg-[#00a884] text-slate-950'
                         }`}
                       >
                         {playingAudioId === msg.id ? (
@@ -452,23 +452,23 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
                           <Play className="h-4 w-4 ml-0.5" />
                         )}
                       </button>
-                      <div className="text-xs font-mono">
-                        ভয়েস নোট {msg.mediaDuration ? `(${msg.mediaDuration}s)` : ''}
+                      <div className="text-xs font-mono text-slate-300">
+                        ভয়েস মেসেজ {msg.mediaDuration ? `(${msg.mediaDuration}s)` : ''}
                       </div>
                     </div>
                   )}
 
                   {/* Text Content */}
                   {msg.content && msg.type !== 'image' && msg.type !== 'audio' && (
-                    <div className="text-xs sm:text-sm">
+                    <div className="leading-relaxed">
                       <FormattedText text={msg.content} isMe={isMe} />
                     </div>
                   )}
 
                   {/* Timestamp */}
                   <div
-                    className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                      isMe ? 'text-teal-100' : 'text-slate-400'
+                    className={`mt-1 flex items-center justify-end gap-1 text-[10px] font-mono tabular-nums ${
+                      isMe ? 'text-teal-200' : 'text-slate-400'
                     }`}
                   >
                     <span>{formatMessageTime(msg.timestamp)}</span>
@@ -483,17 +483,17 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
       </div>
 
       {/* Input Bar */}
-      <div className="border-t border-slate-200 bg-white p-2.5 sm:p-3">
+      <div className="border-t border-[#222d34] bg-[#111b21] p-2.5 sm:p-3">
         {isRecording ? (
-          <div className="flex items-center justify-between rounded-2xl bg-red-50 p-2 border border-red-200 animate-pulse">
-            <div className="flex items-center gap-2 text-red-600 font-mono text-xs px-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-600 animate-ping" />
+          <div className="flex items-center justify-between rounded-xl bg-red-950/40 p-2 border border-red-500/30 animate-pulse">
+            <div className="flex items-center gap-2 text-red-400 font-mono text-xs px-2 tabular-nums">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-ping" />
               <span>রেকর্ডিং চলছে: {recordingDuration}s</span>
             </div>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={cancelRecording}
-                className="rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition cursor-pointer"
+                className="rounded-xl px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-[#202c33] transition cursor-pointer"
               >
                 বাতিল
               </button>
@@ -520,11 +520,11 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingImage}
-              className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-teal-600 transition cursor-pointer"
+              className="rounded-xl p-2 text-slate-400 hover:bg-[#202c33] hover:text-[#00a884] transition cursor-pointer"
               title="ছবি পাঠান"
             >
               {uploadingImage ? (
-                <Loader2 className="h-5 w-5 animate-spin text-teal-600" />
+                <Loader2 className="h-5 w-5 animate-spin text-[#00a884]" />
               ) : (
                 <ImageIcon className="h-5 w-5" />
               )}
@@ -534,7 +534,7 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
             <button
               type="button"
               onClick={startRecording}
-              className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-teal-600 transition cursor-pointer"
+              className="rounded-xl p-2 text-slate-400 hover:bg-[#202c33] hover:text-[#00a884] transition cursor-pointer"
               title="ভয়েস মেসেজ রেকর্ড করুন"
             >
               <Mic className="h-5 w-5" />
@@ -558,20 +558,20 @@ export const LevelChatWindow: React.FC<LevelChatWindowProps> = ({
                   }
                 }
               }}
-              className="flex-1 rounded-2xl border border-slate-200 bg-slate-50/80 py-2.5 px-3.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none transition shadow-2xs resize-none max-h-32 overflow-y-auto leading-normal"
+              className="flex-1 rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 px-3.5 text-xs sm:text-sm text-white placeholder:text-slate-400 focus:border-[#00a884] focus:outline-none transition shadow-2xs resize-none max-h-32 overflow-y-auto leading-normal"
             />
 
             {/* Send Button */}
             <button
               type="submit"
               disabled={!inputText.trim() || sending}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-600 text-white shadow-xs hover:opacity-95 disabled:opacity-40 transition cursor-pointer"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#00a884] text-slate-950 font-bold shadow-xs hover:bg-[#008f72] disabled:opacity-40 transition cursor-pointer"
               title="মেসেজ পাঠান"
             >
               {sending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-slate-950" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4 text-slate-950 fill-slate-950" />
               )}
             </button>
           </form>

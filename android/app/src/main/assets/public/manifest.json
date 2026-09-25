@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "Unity Earning Live Chat",
+  "short_name": "UnityChat",
+  "description": "Fast, lightweight real-time live messaging for mobile and web.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

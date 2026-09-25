@@ -203,7 +203,7 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3.5 bg-gradient-to-b from-slate-100/50 to-teal-50/30">
+      <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 bg-[#0b141a]">
         {messages.map((msg) => {
           const isBot = msg.sender === 'bot';
           return (
@@ -212,24 +212,24 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
               className={`flex items-end gap-2.5 ${isBot ? 'justify-start' : 'justify-end'}`}
             >
               {isBot && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-teal-700 to-emerald-600 text-white shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[#00a884] text-slate-950 font-bold shadow-xs">
                   <Bot className="h-4 w-4" />
                 </div>
               )}
 
               <div
-                className={`max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm ${
+                className={`max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-sm ${
                   isBot
-                    ? 'bg-white text-slate-800 border border-teal-100/80 rounded-bl-xs'
-                    : 'bg-gradient-to-r from-teal-700 to-emerald-700 text-white rounded-br-xs font-medium'
+                    ? 'bg-[#202c33] text-slate-100 border border-[#222d34] rounded-bl-xs'
+                    : 'bg-[#005c4b] text-white rounded-br-xs font-medium'
                 }`}
               >
                 <div>
                   <FormattedText text={msg.text} isMe={!isBot} />
                 </div>
                 <div
-                  className={`mt-1.5 text-[9px] text-right font-medium ${
-                    isBot ? 'text-slate-400' : 'text-teal-100'
+                  className={`mt-1.5 text-[9px] text-right font-mono tabular-nums ${
+                    isBot ? 'text-slate-400' : 'text-teal-200'
                   }`}
                 >
                   {msg.timestamp}
@@ -237,7 +237,7 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
               </div>
 
               {!isBot && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-slate-800 text-white shadow-xs">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[#202c33] text-slate-200 shadow-xs border border-[#222d34]">
                   <User className="h-4 w-4" />
                 </div>
               )}
@@ -247,13 +247,13 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
 
         {loading && (
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-teal-700 text-white">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[#00a884] text-slate-950">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="rounded-2xl bg-white border border-teal-100 px-4 py-3 shadow-xs flex items-center gap-2 text-xs text-teal-800 font-semibold">
-              <span className="h-2 w-2 rounded-full bg-teal-600 animate-bounce" />
-              <span className="h-2 w-2 rounded-full bg-teal-600 animate-bounce [animation-delay:0.2s]" />
-              <span className="h-2 w-2 rounded-full bg-teal-600 animate-bounce [animation-delay:0.4s]" />
+            <div className="rounded-2xl bg-[#202c33] border border-[#222d34] px-4 py-3 shadow-xs flex items-center gap-2 text-xs text-teal-300 font-semibold">
+              <span className="h-2 w-2 rounded-full bg-[#00a884] animate-bounce" />
+              <span className="h-2 w-2 rounded-full bg-[#00a884] animate-bounce [animation-delay:0.2s]" />
+              <span className="h-2 w-2 rounded-full bg-[#00a884] animate-bounce [animation-delay:0.4s]" />
               <span className="ml-1 text-[11px]">ইউনিটি চ্যাট বট টাইপ করছেন...</span>
             </div>
           </div>
@@ -263,15 +263,15 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
       </div>
 
       {/* Quick Suggested Question Chips */}
-      <div className="px-3.5 py-2.5 bg-white border-t border-teal-100/60 overflow-x-auto flex items-center gap-2 scrollbar-none shadow-2xs">
-        <span className="text-[10px] font-extrabold text-teal-800 shrink-0 bg-teal-50 px-2 py-1 rounded-lg border border-teal-100">
+      <div className="px-3.5 py-2.5 bg-[#111b21] border-t border-[#222d34] overflow-x-auto flex items-center gap-2 scrollbar-none shadow-xs">
+        <span className="text-[10px] font-bold text-teal-300 shrink-0 bg-[#202c33] px-2 py-1 rounded-lg border border-[#222d34]">
           প্রশ্নসমূহ:
         </span>
         {quickQuestions.map((q, idx) => (
           <button
             key={idx}
             onClick={() => handleQuickClick(q)}
-            className="shrink-0 rounded-xl bg-teal-50/90 border border-teal-200 px-3 py-1.5 text-[11px] font-bold text-teal-900 hover:bg-teal-600 hover:text-white transition cursor-pointer shadow-2xs active:scale-95"
+            className="shrink-0 rounded-xl bg-[#202c33] border border-[#222d34] px-3 py-1.5 text-[11px] font-semibold text-slate-200 hover:bg-[#00a884] hover:text-slate-950 hover:border-[#00a884] transition cursor-pointer shadow-xs active:scale-95"
           >
             {q}
           </button>
@@ -279,7 +279,7 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSend} className="p-3 bg-white border-t border-slate-200/80">
+      <form onSubmit={handleSend} className="p-3 bg-[#111b21] border-t border-[#222d34]">
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -287,14 +287,14 @@ export const UnityBotChat: React.FC<UnityBotChatProps> = ({ onGoHome }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={loading}
-            className="flex-1 rounded-2xl border border-teal-200/80 bg-slate-50 py-2.5 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:outline-none transition shadow-2xs font-medium"
+            className="flex-1 rounded-xl border border-[#222d34] bg-[#202c33] py-2.5 px-4 text-xs sm:text-sm text-white placeholder:text-slate-400 focus:border-[#00a884] focus:outline-none transition shadow-2xs font-medium"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-700 text-white shadow-xs hover:from-teal-800 hover:to-emerald-800 disabled:opacity-40 transition cursor-pointer shrink-0"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#00a884] text-slate-950 shadow-xs hover:bg-[#008f72] disabled:opacity-40 transition cursor-pointer shrink-0 font-bold"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4 text-slate-950 fill-slate-950" />
           </button>
         </div>
       </form>
